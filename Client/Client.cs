@@ -20,7 +20,7 @@ namespace Client
             lastBlip = _lastBlip;
             EventHandlers["onClientResourceStart"] += new Action<string>(OnClientResourceStart);
             EventHandlers["securityBraceletRespFromServ"] += new Action<string, string, Vector3>(securityBraceletRespFromServ);
-            EventHandlers["gpsPositionsFromServer"] += new Action<string>(gpsPositionsFromServer);
+            EventHandlers["gpsPositionsFromServer"] += new Action<string, int, int>(gpsPositionsFromServer);
             EventHandlers["cn90437589fh7avbn98c7w53987cvwcwe"] += new Action<string>(loadFromJsonTemplate);
         }
 
@@ -28,7 +28,7 @@ namespace Client
         {
             template = response;
         }
-        
+
         private void OnClientResourceStart(string resourceName)
         {
             player = Game.Player;
@@ -44,12 +44,12 @@ namespace Client
             {
                 string c = string.Join(" ", args.ToArray());
                 string[] ts = c.Split(',');
-                TriggerServerEvent("setNewGpsClient" + template,ts[0], ts[1], ts[2]);
+                TriggerServerEvent("setNewGpsClient" + template, ts[0], ts[1], ts[2]);
             }), false);
 
             RegisterCommand("gpsOff", new Action<int, List<object>, string>((source, args, raw) =>
             {
-                TriggerServerEvent("playerOff" + template);
+                TriggerServerEvent("playerOff" + template, 1);
             }), false);
 
             TriggerServerEvent("M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd" + template);
@@ -66,28 +66,29 @@ namespace Client
             SetBlipSprite(blip, 1);
             SetBlipColour(blip, 3);
         }
-        private async void removeBlip(int blip,int time)
+        private async void removeBlip(int blip, int time)
         {
             await Delay(time); //
             RemoveBlip(ref blip);
         }
 
-        private void gpsPositionsFromServer(string json)
+        private void gpsPositionsFromServer(string json, int pollingRate, int blipSprite)
         {
             Dictionary<string, GpsDic> gps = JsonConvert.DeserializeObject<Dictionary<string, GpsDic>>(json);
-            foreach(var v in gps)
+            foreach (var v in gps)
             {
                 if (v.Value.PedId != player.ServerId.ToString())
                 {
-                    AddTextEntry("MYBLIP", "." + v.Value.PedName);
-                    var blip = AddBlipForCoord(v.Value.PedCoordinats.X, v.Value.PedCoordinats.Y, v.Value.PedCoordinats.Z);
-                    SetBlipSprite(blip, 11);
-                    SetBlipColour(blip, 15);
-                    SetBlipRotation(blip, Ceil(v.Value.PedDirection));
-                    BeginTextCommandSetBlipName("." + v.Value.PedName);
-                    EndTextCommandSetBlipName(blip);
-                    removeBlip(blip, 1000);
-                }
+               
+                var blip = AddBlipForCoord(v.Value.PedCoordinats.X, v.Value.PedCoordinats.Y, v.Value.PedCoordinats.Z);
+                SetBlipSprite(blip, blipSprite);
+                SetBlipColour(blip, Convert.ToInt32(v.Value.PedColor));
+                SetBlipRotation(blip, Ceil(v.Value.PedDirection));
+                BeginTextCommandSetBlipName("STRING");
+                AddTextComponentString("."+ v.Value.PedName);
+                EndTextCommandSetBlipName(blip);
+                removeBlip(blip, pollingRate);
+                 }
             }
         }
 
@@ -97,7 +98,7 @@ namespace Client
             public string PedId;
             public string PedName;
             public string PedFrequency;
-            public int PedColor;
+            public string PedColor;
             public float PedDirection;
             public Vector3 PedCoordinats;
         }

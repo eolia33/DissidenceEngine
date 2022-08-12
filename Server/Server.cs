@@ -16,6 +16,8 @@ namespace Server
         public Dictionary<string, GpsDic> gpsListing { get; set; }
         public List<string> frequencyList { get; set; }
 
+        public bool awaiting { get; set; }
+        public string jobQb { get; set; }
         public string securityKey { get; set; }
         public Server()
         {
@@ -25,29 +27,29 @@ namespace Server
 
             gpsListing = _gpsListing;
             frequencyList = _frequencyList;
+            awaiting = false;
 
             #region EventHandlers
+            EventHandlers["returnQbJobFromQbCore"] += new Action<string,string>(playerJob);
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] += new Action<Player>(sendingSecurityKey);
             EventHandlers["getSecurityBraceletCallFromClient"] += new Action<string, string>(getSecurityBraceletCallFromClient);
             EventHandlers["getSecurityBraceletNotificationForPlolice"] += new Action<string, string>(getSecurityBraceletNotificationForPlolice);
-            EventHandlers["setNewGpsClient"] += new Action<Player, string, string, string,string>(setNewGpsClient);
+            EventHandlers["setNewGpsClient"] += new Action<Player, string, string,string>(setNewGpsClient);
             EventHandlers["playerDropped"] += new Action<Player, string>(OnPlayerDropped);
-            EventHandlers["playerOff"] += new Action<Player>(userIsLeaving);
+            EventHandlers["playerOff"] += new Action<Player,int>(userIsLeaving);
 
             #endregion 
 
             _ = Task.Run(() => { GpsListeningClients(gpsListing, frequencyList); });
         }
 
-
         #region IsConnecting / IsUpdatingSettings²
-        private void setNewGpsClient([FromSource] Player player, string frequency, string jobName, string name, string color)
+        private async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color)
         {
-
             var id = player.Handle.ToString();
             var licence = player.Identifiers["license"];
 
-            if (isThisFrequencyProtected(Convert.ToInt32(frequency), jobName))
+            if (isThisFrequencyProtected(Convert.ToInt32(frequency),player))
             {
                 Players[player.Character.NetworkId].TriggerEvent(config.playerNotification, config.radioAcessDeniedMsg);
                 return;
@@ -66,12 +68,14 @@ namespace Server
                 }
             }
 
-            Players[Convert.ToInt32(id)].TriggerEvent(config.playerNotification, config.radioAcessSuccesfull + frequency);
+          Players[Convert.ToInt32(id)].TriggerEvent(config.playerNotification, config.radioAcessSuccesfull + frequency);
 
           if (!gpsListing.ContainsKey(licence))
                 gpsListing.Add(licence, dictionaryConstruct(licence,id, name, frequency, GetEntityCoords(GetPlayerPed(id)),color, 1, 0)) ;
           else
                dictionaryUpdate(licence,id, name,  frequency, GetEntityCoords(GetPlayerPed(id)),color, 1);
+
+            await Task.FromResult(0);
         }
        
         #endregion
@@ -79,49 +83,67 @@ namespace Server
         #region IsDisconnecting / Is Leaving
         private void OnPlayerDropped([FromSource] Player player, string reason)
         {
-            var licence = player.Identifiers["license"];
-            var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
-
-            if (linq.Value.PedLicence != null)
+            try
             {
-                if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
-                    frequencyList.Remove(linq.Value.PedFrequency);
+                var licence = player.Identifiers["license"];
+                var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
 
-                gpsListing.Remove(linq.Value.PedLicence);
-
-                var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
-                foreach (var result in linqb)
+                if (linq.Value.PedLicence != null)
                 {
-                    Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
-                }
+                    if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
+                        frequencyList.Remove(linq.Value.PedFrequency);
 
+                    gpsListing.Remove(linq.Value.PedLicence);
+
+                    var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
+
+                    foreach (var result in linqb)
+                    {
+                        Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
+                    }
+                }
             }
 
-        }
+            catch (Exception)
+            {
 
-        private void userIsLeaving([FromSource] Player player)
+            }   
+        }
+        private void userIsLeaving([FromSource] Player player, int reason)
         {
-             var licence = player.Identifiers["license"];
-            Players[Convert.ToInt32(player.Handle)].TriggerEvent(config.playerNotification, "Vous venez de couper votre balise");
-
-            var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
-
-            if (linq.Value.PedLicence != null)
+            try
             {
-                if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
-                    frequencyList.Remove(linq.Value.PedFrequency);
-
-                gpsListing.Remove(linq.Value.PedLicence);
-
-                var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
-                foreach (var result in linqb)
+                var licence = player.Identifiers["license"];
+                var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
+                if (linq.Value.PedLicence != null)
                 {
-                    Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
+                    if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
+                        frequencyList.Remove(linq.Value.PedFrequency);
+
+                    gpsListing.Remove(linq.Value.PedLicence);
+                    Players[Convert.ToInt32(player.Handle)].TriggerEvent(config.playerNotification, "Vous venez de couper votre balise");
+                    var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
+                    foreach (var result in linqb)
+                    {
+                        switch (reason)
+                        {
+                            case 1:
+                                Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
+                                break;
+
+                            case 2:
+                                Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "Warning : " + linq.Value.PedName + " balise retirée ! ");
+                                break;
+                        }
+                    }
                 }
-             
             }
-            
+            catch (Exception)
+            {
+
+            }   
         }
+
         private bool isItTheLastManStanding(string frequency, string pedId)
         {
             var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId);
@@ -132,21 +154,40 @@ namespace Server
                 return true;
             
         }
-
         #endregion
 
-        #region IsProtectedFrequency
-
-        public bool isThisFrequencyProtected(int frequency, string job)
+        #region IsProtectedFrequence
+        private void playerJob(string job, string id)
         {
-            Debug.WriteLine(frequency.ToString());
-            Debug.WriteLine(config.s1.ToString());
+            if (id == securityKey)
+            {
+                awaiting = false;
+            }
+        }
+
+        private bool checkPlayerJob(Player player)
+        {
+            TriggerEvent("QBBridge:GetJob", player.Handle, securityKey);
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (!awaiting)
+                    return true;
+                else
+                    System.Threading.Thread.Sleep(100);
+            }
+            return false;
+        }
+        public bool isThisFrequencyProtected(int frequency, Player player)
+        {
 
             if (frequency == config.s1)
             {
+                checkPlayerJob(player);
+
                 foreach (string f in config.m1)
                 {
-                    if(job == f)
+                    if(jobQb == f)
                     {
                         return false;
                     }
@@ -158,7 +199,7 @@ namespace Server
         #endregion
 
         #region Task for GPS refreshing
-        private async Task GpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
+        private Task GpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
         {
             while (true)
             {
@@ -174,7 +215,7 @@ namespace Server
 
                     Debug.WriteLine("Nombre de fréquences actives en boucle " + linqC);
 
-                    if (linqC > 1)
+                    if (linqC > 0)
                     {
                         var linq = gpsClient.Where(x => x.Value.PedFrequency == frequency);
 
@@ -190,17 +231,18 @@ namespace Server
                         var linqJson = gpsClient.Where(x => x.Value.PedFrequency == frequency);
                         foreach (var result in linqJson)
                         {
-                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("gpsPositionsFromServer", JsonToPush);
+                        Debug.WriteLine(JsonToPush);
+                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("gpsPositionsFromServer", JsonToPush,config.pollingRate,config.blipSprite);
                         }      
                     }
                 }
-            System.Threading.Thread.Sleep(1000);
+
+                System.Threading.Thread.Sleep(config.pollingRate);
             }
         }
         #endregion
 
         #region Gps Core
-
         public GpsDic dictionaryConstruct(string licence, string id, string name, string frequency, Vector3 vector,string color, int gpsType, float direction)
         {
             var newGpsClient = new GpsDic
@@ -256,7 +298,6 @@ namespace Server
         #region EventTriggerProtection
         private string eventProtection()
         {
-
             var keyBase = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             var keySize = new char[50];
             var random = new Random();
@@ -280,7 +321,5 @@ namespace Server
             Players[source.Character.NetworkId].TriggerEvent("cn90437589fh7avbn98c7w53987cvwcwe", securityKey);
         }
         #endregion
-
-
     }
 }

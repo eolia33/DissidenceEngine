@@ -21,5 +21,7 @@ namespace Configuration
         public string radioAcessDeniedMsg { get; set; }
         public string playerNotification { get; set; }
         public string radioAcessSuccesfull { get; set; }
+        public int pollingRate { get; set; }
+        public int blipSprite { get; set; }
     }
  }
