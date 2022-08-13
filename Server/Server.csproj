@@ -53,8 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tracker.cs" />
-    <Compile Include="noSqlPlayer.cs" />
+    <Compile Include="Bracelet\Bracelet.cs" />
+    <Compile Include="Tracker\Tracker.cs" />
+    <Compile Include="Bridge\Bridge.cs" />
     <Compile Include="Type\PlayerNoSql.cs" />
     <Compile Include="Type\Json.cs" />
     <Compile Include="Server.cs" />

@@ -7,13 +7,13 @@ using static CitizenFX.Core.Native.API;
 
 namespace Server
 {
-    public class QbSql : BaseScript
+    public class BridgeQBCore : BaseScript
     {
         public int _serverId;
         public int _playerId;
         public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
 
-        public QbSql(Dictionary<string, PlayerNoSql> _playersNoSql)
+        public BridgeQBCore(Dictionary<string, PlayerNoSql> _playersNoSql)
         {
             playersNoSql = _playersNoSql;
         }

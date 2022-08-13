@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using CitizenFX.Core;
 using static CitizenFX.Core.Native.API;
@@ -16,48 +14,37 @@ namespace Server
     {
         public static PlayerList PlayerList { get; set; }
         public Config config { get; private set; }
-        public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
+        public Dictionary<string, PlayerNoSql> bridgeQbCore { get; set; }
         public string jobQb { get; set; }
         public string securityKey { get; set; }
         public Server()
         {
-            config = JsonConvert.DeserializeObject<Config>(LoadResourceFile(GetCurrentResourceName(), "config.json"));
-           
-            Dictionary<string, PlayerNoSql> _playersNoSql = new Dictionary<string, PlayerNoSql>();
+            config = JsonConvert.DeserializeObject<Config>(LoadResourceFile(GetCurrentResourceName(), "config.json"));     
+            
+            Dictionary<string, PlayerNoSql> _bridgeQbCore = new Dictionary<string, PlayerNoSql>();
 
-            playersNoSql = _playersNoSql;
+            bridgeQbCore = _bridgeQbCore;
 
-            QbSql noSql = new QbSql(playersNoSql);
+            // Required::Core::Brisge from QB to C#
+            BridgeQBCore noSql = new BridgeQBCore(bridgeQbCore);
+
+            // Tracker Server
             Tracker tracker = new Tracker(config,noSql);
+
+            // GPS Bracelet Server
+            Bracelet bracelet = new Bracelet();
 
             #region EventHandlers
             EventHandlers["returnQbJobFromQbCore"] += new Action<string>(noSql.playerDataManagement);
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] += new Action<Player>(sendingSecurityKey);
-            EventHandlers["getSecurityBraceletCallFromClient"] += new Action<string, string>(getSecurityBraceletCallFromClient);
-            EventHandlers["getSecurityBraceletNotificationForPlolice"] += new Action<string, string>(getSecurityBraceletNotificationForPlolice);
+            EventHandlers["getSecurityBraceletCallFromClient"] += new Action<string, string>(bracelet.getSecurityBraceletCallFromClient);
+            EventHandlers["getSecurityBraceletNotificationForPlolice"] += new Action<string, string>(bracelet.getSecurityBraceletNotificationForPlolice);
             EventHandlers["setNewGpsClient"] += new Action<Player, string, string,string>(tracker.setNewGpsClient);
             EventHandlers["playerDropped"] += new Action<Player, string>(tracker.OnPlayerDropped);
             EventHandlers["playerOff"] += new Action<Player,int>(tracker.userIsLeaving);
             #endregion 
 
-    
         }
-
-
-        #region Security Bracelt
-        public void getSecurityBraceletCallFromClient(string playerId, string targetId)
-        {
-            Players[Convert.ToInt32(targetId)].TriggerEvent("QBCore:Notify", "Votre bracelet electronique vient d'être activé");
-
-            Vector3 playerCoords = GetEntityCoords(GetPlayerPed(targetId));
-
-            Players[Convert.ToInt32(playerId)].TriggerEvent("securtyBraceletRespFromServ", playerId, targetId, playerCoords);
-        }
-        public void getSecurityBraceletNotificationForPlolice(string playerId, string message)
-        {
-            Players[Convert.ToInt32(playerId)].TriggerEvent("QBCore:Notify", message);
-        }
-        #endregion
 
         #region EventTriggerProtection
         private string eventProtection()

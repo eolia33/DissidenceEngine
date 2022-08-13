@@ -17,15 +17,15 @@ namespace Server
         public int _serverId;
         public int _playerId;
         public Config config;
-        public QbSql qbSql;
+        public BridgeQBCore bridgeQBcore;
         public bool awaiting { get; set; }
         public Dictionary<string, GpsDic> gpsListing { get; set; }
         public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
         public List<string> frequencyList { get; set; }
-        public Tracker(Config _config,QbSql _qbSql)
+        public Tracker(Config _config,BridgeQBCore _bridgeQBcore)
         {
             config = _config;
-            qbSql = _qbSql;
+            bridgeQBcore = _bridgeQBcore;
 
             List<string> _frequencyList = new List<string>();
             Dictionary<string, GpsDic> _gpsListing = new Dictionary<string, GpsDic>();
@@ -76,7 +76,6 @@ namespace Server
         #region IsDisconnecting / Is Leaving
         public void OnPlayerDropped([FromSource] Player player, string reason)
         {
-
             try
             {
                 var licence = player.Identifiers["license"];
