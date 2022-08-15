@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{15AC66A9-7039-4271-95B2-CE72361B16BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "[Cs]Qb-Client", "[Cs]Qb-Client\[Cs]Qb-Client.csproj", "{15AC66A9-7039-4271-95B2-CE72361B16BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{0FD1D102-9E38-4B43-B613-EE5B84B80DB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "[Cs]Qb-Server", "[Cs]Qb-Server\[Cs]Qb-Server.csproj", "{0FD1D102-9E38-4B43-B613-EE5B84B80DB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Configuration", "Configuration\Configuration.csproj", "{BA0BDAEA-F374-4394-BDFE-80EEBD41CCA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "[Cs]Qb-Conf", "[Cs]Qb-Conf\[Cs]Qb-Conf.csproj", "{BA0BDAEA-F374-4394-BDFE-80EEBD41CCA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,8 +7,6 @@ using CitizenFX.Core;
 using static CitizenFX.Core.Native.API;
 using Configuration;
 using QbBridge;
-using noSql;
-
 
 namespace Server
 {
@@ -16,13 +14,13 @@ namespace Server
     {
         public int _serverId;
         public int _playerId;
-        public Config config;
+        public SharedConfig config;
         public BridgeQBCore bridgeQBcore;
         public bool awaiting { get; set; }
         public Dictionary<string, GpsDic> gpsListing { get; set; }
         public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
         public List<string> frequencyList { get; set; }
-        public Tracker(Config _config,BridgeQBCore _bridgeQBcore)
+        public Tracker(SharedConfig _config, BridgeQBCore _bridgeQBcore)
         {
             config = _config;
             bridgeQBcore = _bridgeQBcore;
@@ -37,7 +35,7 @@ namespace Server
         }
         #region IsConnecting / IsUpdatingSettings²
 
-       public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color)
+        public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color)
         {
             var id = player.Handle.ToString();
             var licence = player.Identifiers["license"];
@@ -102,7 +100,7 @@ namespace Server
 
             }
         }
-       public void userIsLeaving([FromSource] Player player, int reason)
+        public void userIsLeaving([FromSource] Player player, int reason)
         {
             Debug.WriteLine("triggerQB");
             TriggerEvent("QBBridge:GetJob", player.Handle, 1);
@@ -139,7 +137,7 @@ namespace Server
             }
         }
 
-       public bool isItTheLastManStanding(string frequency, string pedId)
+        public bool isItTheLastManStanding(string frequency, string pedId)
         {
             var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId);
 
@@ -160,7 +158,7 @@ namespace Server
         }
 
         public bool checkPlayerJob(Player player)
-        {       
+        {
             for (int i = 0; i < 5; i++)
             {
                 if (!awaiting)
@@ -205,25 +203,32 @@ namespace Server
                 {
                     var linqC = gpsClient.Where(x => x.Value.PedFrequency == frequency).Count();
 
-                    if (linqC > 1)
-                    {
+                  if (linqC > 1)
+                   {
                         var linq = gpsClient.Where(x => x.Value.PedFrequency == frequency);
 
-                        Dictionary<string, GpsDic> GpsListingJson = new Dictionary<string, GpsDic>();
+                        Dictionary<string, GpsNetworkClient> GpsListingJson = new Dictionary<string, GpsNetworkClient>();
 
                         foreach (var result in linq)
                         {
-                            GpsListingJson.Add(result.Value.PedId, dictionaryConstruct("0", result.Value.PedId, result.Value.PedName, result.Value.PedFrequency, result.Value.PedCoordinats, result.Value.PedColor, 1, result.Value.PedDirection));
-                        }
+                            GpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
+                            {
+                                PedId = result.Value.PedId,
+                                PedName = result.Value.PedName,
+                                PedColor = result.Value.PedColor,
+                                PedDirection = result.Value.PedDirection,
+                                PedCoordinats = result.Value.PedCoordinats
+                            });
 
+                         }
                         var JsonToPush = JsonConvert.SerializeObject(GpsListingJson);
 
                         var linqJson = gpsClient.Where(x => x.Value.PedFrequency == frequency);
                         foreach (var result in linqJson)
                         {
-                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("gpsPositionsFromServer", JsonToPush, config.pollingRate, config.blipSprite);
+                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("C#:Engine:Client:Tracker:Ping", JsonToPush, config.pollingRate, config.blipSprite);
                         }
-                    }
+                   }
                 }
 
                 System.Threading.Thread.Sleep(config.pollingRate);
@@ -256,20 +261,16 @@ namespace Server
             gpsListing[linq.Key].PedDirection = 0;
             gpsListing[linq.Key].PedCoordinats = vector;
         }
+        #endregion
 
-        public class GpsDic
+
+        public class GpsNetworkClient
         {
-            public string PedLicence;
             public string PedId;
             public string PedName;
-            public string PedFrequency;
             public string PedColor;
             public float PedDirection;
             public Vector3 PedCoordinats;
         }
-        #endregion
-
-
-
     }
 }

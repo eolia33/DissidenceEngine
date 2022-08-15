@@ -8,7 +8,7 @@ using static CitizenFX.Core.Native.API;
 
 namespace Server
 {
-    internal class Bracelet:BaseScript
+    internal class Bracelet : BaseScript
     {
         public void getSecurityBraceletCallFromClient(string playerId, string targetId)
         {

@@ -1,9 +1,9 @@
-﻿using noSql;
-using QbBridge;
+﻿using QbBridge;
 using System.Collections.Generic;
 using System.Linq;
 using CitizenFX.Core;
 using static CitizenFX.Core.Native.API;
+using Newtonsoft.Json;
 
 namespace Server
 {
@@ -11,16 +11,16 @@ namespace Server
     {
         public int _serverId;
         public int _playerId;
-        public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
+        public Dictionary<string, Configuration.PlayerNoSql> playersNoSql { get; set; }
 
-        public BridgeQBCore(Dictionary<string, PlayerNoSql> _playersNoSql)
+        public BridgeQBCore(Dictionary<string, Configuration.PlayerNoSql> _playersNoSql)
         {
             playersNoSql = _playersNoSql;
         }
 
-        private PlayerNoSql insertGlobalNoSql(QbCore playerData)
+        private Configuration.PlayerNoSql insertGlobalNoSql(QbCore playerData)
         {
-            var newPlayerClient = new PlayerNoSql
+            var newPlayerClient = new Configuration.PlayerNoSql
             {
                 name = playerData.PlayerData.Name,
                 id = playerData.PlayerData.Id,
@@ -68,7 +68,7 @@ namespace Server
             playersNoSql[linq.Key].jobGrade = playerData.PlayerData.Job.Grade.Name;
         }
 
-        public async void playerDataManagement(string dataFromQbCore)
+        public void playerDataManagement(string dataFromQbCore, string playerid)
         {
             var playerData = QbBridge.QbCore.FromJson(dataFromQbCore);
             bool isInside = playersNoSql.ContainsKey(playerData.PlayerData.License);
@@ -82,6 +82,35 @@ namespace Server
                 updateGlobalNoSql(playerData);
             }
 
+            sendDataToClient(playerData, playerid);
         }
-    }
+
+        public void sendDataToClient(QbCore playerData, string playerid)
+        {
+            List<Configuration.PlayerNoSql> listToJson = new List<Configuration.PlayerNoSql>();
+
+            listToJson.Add(new Configuration.PlayerNoSql()
+            {
+                license = playerData.PlayerData.License,
+                gangName = playerData.PlayerData.Gang.Name,
+                gangIsboss = playerData.PlayerData.Gang.Isboss,
+                gangLabel = playerData.PlayerData.Gang.Label,
+                gangGrade = playerData.PlayerData.Gang.Grade.Name,
+                citizenid = playerData.PlayerData.Citizenid,
+                birthdate = playerData.PlayerData.Charinfo.Birthdate.ToString(),
+                phone = playerData.PlayerData.Charinfo.Phone,
+                cid = playerData.PlayerData.Charinfo.Cid,
+                firstname = playerData.PlayerData.Charinfo.Firstname,
+                lastname = playerData.PlayerData.Charinfo.Lastname,
+                gender = playerData.PlayerData.Charinfo.Gender,
+                account = playerData.PlayerData.Charinfo.Account,
+                jobOnDuty = playerData.PlayerData.Job.Onduty,
+                jobName = playerData.PlayerData.Job.Name,
+                jobGrade = playerData.PlayerData.Job.Grade.Name,
+            });
+
+            Players[playerid].TriggerEvent("c#ServerUpdate", JsonConvert.SerializeObject(listToJson));
+        }
+
+        }
 }
