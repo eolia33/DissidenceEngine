@@ -18,6 +18,7 @@ namespace Client
         public SharedConfig configuration { get; set; }
         public Player player { get; set; }
 
+        public string color { get; set; }
         public NuiState nuiState { get; set; }
 
 
@@ -27,6 +28,8 @@ namespace Client
             configuration = _configuration;
             player = _player;
             nuiState = _nuiState;
+            color = "1";
+
         }
 
         public void trackerOpen()
@@ -42,16 +45,26 @@ namespace Client
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
             nuiState.visible = true;
             nuiState.mouse = true;
-            Debug.WriteLine("bloque");
             API.SendNuiMessage(jsonString);
         }
         public void trackerClose()
         {
-            Debug.WriteLine("clse");
             string jsonString = "{\"type\":\"Close\",\"enable\":true}";
             nuiState.visible = false;
             nuiState.mouse = false;
             API.SendNuiMessage(jsonString);
+        }
+
+        public void trackerOk()
+        {
+            string jsonString = "{\"type\":\"On\",\"enable\":true}";
+            nuiState.visible = false;
+            nuiState.mouse = false;
+            API.SendNuiMessage(jsonString);
+        }
+        public void trackerSetColor(IDictionary<string, object> json)
+        {
+            color = json["color"].ToString();
         }
         public void trackerJoin(IDictionary<string, object> json)
         {
@@ -116,6 +129,7 @@ namespace Client
             public float PedDirection;
             public Vector3 PedCoordinats;
         }
+
 
     }
 }

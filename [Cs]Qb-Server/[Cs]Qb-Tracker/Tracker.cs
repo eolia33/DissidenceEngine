@@ -37,6 +37,8 @@ namespace Server
 
         public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color)
         {
+
+            Debug.WriteLine( frequency + name + color);
             var id = player.Handle.ToString();
             var licence = player.Identifiers["license"];
 
@@ -60,13 +62,18 @@ namespace Server
             }
 
             Players[Convert.ToInt32(id)].TriggerEvent(config.playerNotification, config.radioAcessSuccesfull + frequency);
+            Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
 
             if (!gpsListing.ContainsKey(licence))
                 gpsListing.Add(licence, dictionaryConstruct(licence, id, name, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
             else
                 dictionaryUpdate(licence, id, name, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1);
 
+
+      
             await Task.FromResult(0);
+
+            
         }
 
         #endregion

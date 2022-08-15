@@ -37,15 +37,15 @@ namespace Client
 
 
             RegisterNuiCallbackType("cs:engine:client:tracker:close");
-            EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] += new Action<IDictionary<string, object>, 
-            CallbackDelegate>((data, cb) => { tracker.trackerClose(); });
+            EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] += new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerClose(); });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:join");
-            EventHandlers["__cfx_nui:cs:engine:client:tracker:join"] += new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
-            {
-                tracker.trackerJoin(data);
+            EventHandlers["__cfx_nui:cs:engine:client:tracker:join"] += new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => {tracker.trackerJoin(data);});
 
-             });
+            RegisterNuiCallbackType("cs:engine:client:tracker:color");
+            EventHandlers["__cfx_nui:cs:engine:client:tracker:color"] += new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerSetColor(data); });
+
+            EventHandlers["cs:engine:client:tracker:connected"] += new Action(tracker.trackerOk);
 
             Tick += OnTick;
         }
