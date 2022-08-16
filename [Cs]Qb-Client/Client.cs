@@ -13,7 +13,6 @@ namespace Client
     {
         private Player player;
         public int lastBlip { get; set; }
-
         public NuiState nuiState { get; set; }
         public string template { get; set; }
         public Point[] points { get; set; }
@@ -21,6 +20,7 @@ namespace Client
         public bool isMouse { get; set; }
         public Tracker tracker { get; set; }
         public SharedConfig config { get; }
+
 
         public Client()
         {
@@ -68,6 +68,14 @@ namespace Client
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
                 {
                     tracker.trackerSetColor(data);
+                });
+
+            RegisterNuiCallbackType("cs:engine:client:tracker:coloronline");
+            EventHandlers["__cfx_nui:cs:engine:client:tracker:coloronline"] +=
+                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
+                {
+                    Debug.WriteLine("color chanbge");
+                    TriggerServerEvent("cs:engine:server:tracker:color:change", data["x"]);
                 });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:notification");

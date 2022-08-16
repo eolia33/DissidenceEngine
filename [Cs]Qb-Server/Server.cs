@@ -44,8 +44,10 @@ namespace Server
             EventHandlers["cs:engine:server:tracker:leave"] +=
                 new Action<Player, int>(tracker.userIsLeaving);
 
-            EventHandlers["cs:engine:server:duty:tracker"] += 
-                new Action<string, bool>(tracker.userDuty);
+           // new Action<string, bool>(tracker.userDuty);
+
+            EventHandlers["cs:engine:server:tracker:color:change"] +=
+                new Action<Player,string>(tracker.userColorChange);
 
             EventHandlers["cs:engine:server:tracker:notification"] +=
                 new Action<Player,int>(tracker.userNotification);

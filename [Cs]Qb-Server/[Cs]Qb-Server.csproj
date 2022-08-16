@@ -68,7 +68,7 @@
   <ItemGroup>
     <ProjectReference Include="..\[Cs]Qb-Conf\[Cs]Qb-Conf.csproj">
       <Project>{ba0bdaea-f374-4394-bdfe-80eebd41cca4}</Project>
-      <Name>[Cs]-Core-ConfNet</Name>
+      <Name>[Cs]Qb-Conf</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

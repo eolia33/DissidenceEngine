@@ -40,6 +40,7 @@ namespace Server
 
         public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color, int notification)
         {
+
             var id = player.Handle;
             var licence = player.Identifiers["license"];
 
@@ -50,12 +51,13 @@ namespace Server
             }
             else
             {
+
                 var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedNotification == 1);
                 foreach (var result in linq)
-                    nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1,"");
+                    nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1, "");
 
             }
-           
+
             nuiNotify(id, config.msg_selfUserJoinTracker, 1, frequency);
 
             Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
@@ -103,9 +105,13 @@ namespace Server
             }
         }
 
-        public void userDuty(string id, bool duty)
+        public void userColorChange([FromSource] Player player, string color)
         {
-            Debug.WriteLine("player duty" + id + "is " + duty);
+            var linq = gpsListing.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
+            var colorOk = Convert.ToInt32(color) + 1; 
+            gpsListing[linq.Key].PedColor = colorOk.ToString();
+            Debug.WriteLine("changfement de couleur");
+
         }
 
         public void userIsLeaving([FromSource] Player player, int reason)
@@ -197,6 +203,7 @@ namespace Server
         {
             while (true)
             {
+                Debug.WriteLine(frequencyList.Count().ToString());
                 foreach (var entry in gpsListing)
                 {
                     entry.Value.PedCoordinats = GetEntityCoords(GetPlayerPed(entry.Value.PedId));
@@ -214,6 +221,8 @@ namespace Server
                         var gpsListingJson = new Dictionary<string, GpsNetworkClient>();
 
                         foreach (var result in linq)
+                        {
+                            Debug.WriteLine(result.Value.PedColor.ToString());
                             gpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
                             {
                                 PedId = result.Value.PedId,
@@ -222,6 +231,7 @@ namespace Server
                                 PedDirection = result.Value.PedDirection,
                                 PedCoordinats = result.Value.PedCoordinats
                             });
+                        }
 
                         var jsonToPush = JsonConvert.SerializeObject(gpsListingJson);
 
