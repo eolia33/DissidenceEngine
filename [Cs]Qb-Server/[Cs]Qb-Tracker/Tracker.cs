@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using CitizenFX.Core;
-using static CitizenFX.Core.Native.API;
 using Configuration;
+using Newtonsoft.Json;
 using QbBridge;
+using static CitizenFX.Core.Native.API;
 
 namespace Server
 {
@@ -20,33 +21,28 @@ namespace Server
         public Dictionary<string, GpsDic> gpsListing { get; set; }
         public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
         public List<string> frequencyList { get; set; }
+
         public Tracker(SharedConfig _config, BridgeQBCore _bridgeQBcore)
         {
             config = _config;
             bridgeQBcore = _bridgeQBcore;
 
-            List<string> _frequencyList = new List<string>();
-            Dictionary<string, GpsDic> _gpsListing = new Dictionary<string, GpsDic>();
+            var _frequencyList = new List<string>();
+            var _gpsListing = new Dictionary<string, GpsDic>();
 
             frequencyList = _frequencyList;
             gpsListing = _gpsListing;
 
-            _ = Task.Run(() => { GpsListeningClients(gpsListing, frequencyList); });
+            _ = Task.Run(() => { gpsListeningClients(gpsListing, frequencyList); });
         }
+
         #region IsConnecting / IsUpdatingSettings²
 
         public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color)
         {
-
-            Debug.WriteLine( frequency + name + color);
-            var id = player.Handle.ToString();
+            var id = player.Handle;
             var licence = player.Identifiers["license"];
 
-            if (isThisFrequencyProtected(Convert.ToInt32(frequency), player))
-            {
-                Players[player.Character.NetworkId].TriggerEvent(config.playerNotification, config.radioAcessDeniedMsg);
-                return;
-            }
 
             if (!frequencyList.Contains(frequency))
             {
@@ -56,24 +52,26 @@ namespace Server
             {
                 var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency);
                 foreach (var result in linq)
-                {
-                    Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent(config.playerNotification, "L'utilisateur " + name + " rejoint la balise");
-                }
-            }
+                    nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1,"");
 
-            Players[Convert.ToInt32(id)].TriggerEvent(config.playerNotification, config.radioAcessSuccesfull + frequency);
+            }
+           
+            nuiNotify(id, config.msg_selfUserJoinTracker, 1, frequency);
+
             Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
 
             if (!gpsListing.ContainsKey(licence))
-                gpsListing.Add(licence, dictionaryConstruct(licence, id, name, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
+                gpsListing.Add(licence,
+                    dictionaryConstruct(licence, id, name, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
             else
                 dictionaryUpdate(licence, id, name, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1);
 
-
-      
             await Task.FromResult(0);
+        }
 
-            
+        public void test(string test)
+        {
+            Debug.WriteLine(test);
         }
 
         #endregion
@@ -96,21 +94,22 @@ namespace Server
                     var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
 
                     foreach (var result in linqb)
-                    {
-                        Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
-                    }
+                        nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTracker, 1, result.Value.PedName);
                 }
             }
 
             catch (Exception)
             {
-
             }
         }
+
+        public void userDuty(string id, bool duty)
+        {
+            Debug.WriteLine("player duty" + id + "is " + duty);
+        }
+
         public void userIsLeaving([FromSource] Player player, int reason)
         {
-            Debug.WriteLine("triggerQB");
-            TriggerEvent("QBBridge:GetJob", player.Handle, 1);
             try
             {
                 var licence = player.Identifiers["license"];
@@ -121,82 +120,80 @@ namespace Server
                         frequencyList.Remove(linq.Value.PedFrequency);
 
                     gpsListing.Remove(linq.Value.PedLicence);
-                    Players[Convert.ToInt32(player.Handle)].TriggerEvent(config.playerNotification, "Vous venez de couper votre balise");
+                    
+                    nuiNotify(player.Handle, config.msg_selfUserLeaveTracker,1, "");
+
                     var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency);
+                    
                     foreach (var result in linqb)
-                    {
                         switch (reason)
                         {
                             case 1:
-                                Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "L'utilisateur " + linq.Value.PedName + " quitte la balise");
+                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTracker, 1, result.Value.PedName);
                                 break;
 
                             case 2:
-                                Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("QBCore:Notify", "Warning : " + linq.Value.PedName + " balise retirée ! ");
+                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTrackerByForce, 1, result.Value.PedName);
                                 break;
                         }
-                    }
                 }
             }
             catch (Exception)
             {
-
             }
         }
 
         public bool isItTheLastManStanding(string frequency, string pedId)
         {
-            var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId);
-
-            if (linq.Any())
+           if(gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId).Any())
                 return false;
-            else
-                return true;
 
+            return true;
         }
+
         #endregion
 
         #region IsProtectedFrequence
+
         public void playerJob(string job, string id)
         {
             Debug.WriteLine(job);
-            var welcome6 = QbBridge.QbCore.FromJson(job);
+            var welcome6 = QbCore.FromJson(job);
             Debug.WriteLine(welcome6.PlayerData.Name);
         }
 
         public bool checkPlayerJob(Player player)
         {
-            for (int i = 0; i < 5; i++)
-            {
+            for (var i = 0; i < 5; i++)
                 if (!awaiting)
                     return true;
                 else
-                    System.Threading.Thread.Sleep(100);
-            }
+                    Thread.Sleep(100);
+
             return false;
         }
+
         public bool isThisFrequencyProtected(int frequency, Player player)
         {
-
             if (frequency == config.s1)
             {
                 checkPlayerJob(player);
 
-                foreach (string f in config.m1)
-                {
+                foreach (var f in config.m1)
                     if ("tot" == f)
-                    {
                         return false;
-                    }
-                }
+
                 return true;
             }
+
             return false;
         }
+
         #endregion
 
         #region Task for GPS refreshing
-        private Task GpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
+
+        private Task gpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
         {
             while (true)
             {
@@ -210,15 +207,14 @@ namespace Server
                 {
                     var linqC = gpsClient.Where(x => x.Value.PedFrequency == frequency).Count();
 
-                  if (linqC > 1)
-                   {
+                    if (linqC > 1)
+                    {
                         var linq = gpsClient.Where(x => x.Value.PedFrequency == frequency);
 
-                        Dictionary<string, GpsNetworkClient> GpsListingJson = new Dictionary<string, GpsNetworkClient>();
+                        var gpsListingJson = new Dictionary<string, GpsNetworkClient>();
 
                         foreach (var result in linq)
-                        {
-                            GpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
+                            gpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
                             {
                                 PedId = result.Value.PedId,
                                 PedName = result.Value.PedName,
@@ -227,24 +223,25 @@ namespace Server
                                 PedCoordinats = result.Value.PedCoordinats
                             });
 
-                         }
-                        var JsonToPush = JsonConvert.SerializeObject(GpsListingJson);
+                        var jsonToPush = JsonConvert.SerializeObject(gpsListingJson);
 
                         var linqJson = gpsClient.Where(x => x.Value.PedFrequency == frequency);
                         foreach (var result in linqJson)
-                        {
-                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("C#:Engine:Client:Tracker:Ping", JsonToPush, config.pollingRate, config.blipSprite);
-                        }
-                   }
+                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("C#:Engine:Client:Tracker:Ping",
+                                jsonToPush, config.pollingRate, config.blipSprite);
+                    }
                 }
 
-                System.Threading.Thread.Sleep(config.pollingRate);
+                Thread.Sleep(config.pollingRate);
             }
         }
+
         #endregion
 
         #region Gps Core
-        public GpsDic dictionaryConstruct(string licence, string id, string name, string frequency, Vector3 vector, string color, int gpsType, float direction)
+
+        public GpsDic dictionaryConstruct(string licence, string id, string name, string frequency, Vector3 vector,
+            string color, int gpsType, float direction)
         {
             var newGpsClient = new GpsDic
             {
@@ -258,7 +255,9 @@ namespace Server
             };
             return newGpsClient;
         }
-        public void dictionaryUpdate(string licence, string id, string name, string frequency, Vector3 vector, string color, int gpsType)
+
+        public void dictionaryUpdate(string licence, string id, string name, string frequency, Vector3 vector,
+            string color, int gpsType)
         {
             var linq = gpsListing.Where(x => x.Value.PedLicence == licence).First();
             gpsListing[linq.Key].PedId = id;
@@ -268,9 +267,8 @@ namespace Server
             gpsListing[linq.Key].PedDirection = 0;
             gpsListing[linq.Key].PedCoordinats = vector;
         }
+
         #endregion
-
-
         public class GpsNetworkClient
         {
             public string PedId;
@@ -278,6 +276,19 @@ namespace Server
             public string PedColor;
             public float PedDirection;
             public Vector3 PedCoordinats;
+        }
+
+        public void nuiNotify(string player, string[] msg, int type, string replace = null)
+        {
+            switch (type)
+            {
+                case 1:
+                    Players[Convert.ToInt32(player)].TriggerEvent(config.notificationEngine,msg[0], msg[1].Replace("{replace}", replace), msg[2], msg[3]);
+                 break;
+                case 2:
+                    Players[Convert.ToInt32(player)].TriggerEvent(config.notificationEngine,msg[0], msg[1].Replace("{replace}", replace), msg[2], msg[3]);
+                    break;
+            }
         }
     }
 }

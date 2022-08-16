@@ -327,6 +327,7 @@ namespace QbBridge
 
         [JsonProperty("criminalrecord")]
         public Criminalrecord Criminalrecord { get; set; }
+
     }
 
     public partial class Criminalrecord

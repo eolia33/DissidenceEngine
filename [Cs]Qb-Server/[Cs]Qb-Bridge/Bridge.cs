@@ -68,9 +68,16 @@ namespace Server
             playersNoSql[linq.Key].jobGrade = playerData.PlayerData.Job.Grade.Name;
         }
 
-        public void playerDataManagement(string dataFromQbCore, string playerid)
+        public void playerDataManagement(string dataFromQbCore)
         {
+            Debug.WriteLine("debut de la reception des données de qbcore");
+
+
             var playerData = QbBridge.QbCore.FromJson(dataFromQbCore);
+
+            Debug.WriteLine("ok");
+            return;
+
             bool isInside = playersNoSql.ContainsKey(playerData.PlayerData.License);
 
             if (!isInside)
@@ -82,7 +89,8 @@ namespace Server
                 updateGlobalNoSql(playerData);
             }
 
-            sendDataToClient(playerData, playerid);
+            Debug.WriteLine(playerData.PlayerData.Id.ToString());
+            sendDataToClient(playerData, playerData.PlayerData.Id.ToString());
         }
 
         public void sendDataToClient(QbCore playerData, string playerid)

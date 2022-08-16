@@ -15,7 +15,7 @@ namespace Client
             configuration = _configuration;
             PlayerNoSql _player = new PlayerNoSql();
             player = _player;
-            EventHandlers["C#:Engine:Client:Bridge:Data"] += new Action<string>(getDataFromServer);
+            //EventHandlers["C#:Engine:Client:Bridge:Data"] += new Action<string>(getDataFromServer);
 
         }
 

@@ -23,8 +23,16 @@ namespace Configuration
         public string[] m5 { get; set; }
         public bool cerbere { get; set; }
         public string radioAcessDeniedMsg { get; set; }
-        public string playerNotification { get; set; }
-        public string radioAcessSuccesfull { get; set; }
+        public string notificationEngine { get; set; }
+
+        public string[] msg_selfUserLeaveTracker { get; set; } = new string[3];
+        public string[] msg_otherUserLeaveTracker { get; set; } = new string[3];
+        public string[] msg_otherUserLeaveTrackerByForce { get; set; } = new string[3];
+        public string[] msg_selfUserJoinTracker { get; set; } = new string[3];
+        public string[] msg_otherUserJoinTracker { get; set; } = new string[3];
+        public string[] msg_selfUserErrorFrequency { get; set; } = new string[3];
+        public string[] msg_selfUserNameFrequency { get; set; } = new string[3];
+        public string[] msg_selfUserNameFrequencyRestricted { get; set; } = new string[3];
         public int pollingRate { get; set; }
         public int blipSprite { get; set; }
     }

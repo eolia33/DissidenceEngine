@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Drawing;
 using Newtonsoft.Json.Linq;
 using Configuration;
+using Client;
 
 
 namespace Client
@@ -15,7 +16,7 @@ namespace Client
     public class Tracker : BaseScript
     {
 
-        public SharedConfig configuration { get; set; }
+        public SharedConfig config { get; set; }
         public Player player { get; set; }
 
         public string color { get; set; }
@@ -25,11 +26,10 @@ namespace Client
 
         public Tracker(SharedConfig _configuration, Bridge _bridge, Player _player, NuiState _nuiState)
         {
-            configuration = _configuration;
+            config = _configuration;
             player = _player;
             nuiState = _nuiState;
             color = "1";
-
         }
 
         public void trackerOpen()
@@ -40,13 +40,6 @@ namespace Client
             API.SendNuiMessage(jsonString);
         }
 
-        public void trackerOff()
-        {
-            string jsonString = "{\"type\":\"Off\",\"enable\":true}";
-            nuiState.visible = true;
-            nuiState.mouse = true;
-            API.SendNuiMessage(jsonString);
-        }
         public void trackerClose()
         {
             string jsonString = "{\"type\":\"Close\",\"enable\":true}";
@@ -55,22 +48,42 @@ namespace Client
             API.SendNuiMessage(jsonString);
         }
 
+        public void trackerLeave()
+        {
+            string jsonString = "{\"type\":\"Off\",\"enable\":true}";
+            nuiState.visible = true;
+            nuiState.mouse = true;
+            API.SendNuiMessage(jsonString);
+            TriggerServerEvent("cs:engine:server:tracker:leave","1");
+        }
+
+
+        public void trackerOff()
+        {
+            string jsonString = "{\"type\":\"Off\",\"enable\":true}";
+            nuiState.visible = true;
+            nuiState.mouse = true;
+            API.SendNuiMessage(jsonString);
+        }
+
         public void trackerOk()
         {
             string jsonString = "{\"type\":\"On\",\"enable\":true}";
-            nuiState.visible = false;
-            nuiState.mouse = false;
+            nuiState.visible = true;
+            nuiState.mouse = true;
             API.SendNuiMessage(jsonString);
         }
         public void trackerSetColor(IDictionary<string, object> json)
         {
-            color = json["color"].ToString();
+            var math = Convert.ToInt32(json["x"]) +1;
+            color = math.ToString();
         }
         public void trackerJoin(IDictionary<string, object> json)
         {
+
             if (json["channel"] == "")
             {
-                TriggerEvent("QBCore:Notify", "Le channel de la balise est vide");
+                nuiNotify(config.msg_selfUserErrorFrequency, "");
                 trackerOff();
                 return;
             }
@@ -78,11 +91,12 @@ namespace Client
             if (json["name"] == "")
             {
                 trackerOff();
-                TriggerEvent("QBCore:Notify", "Le nom doit être renseigné");
+                nuiNotify(config.msg_selfUserNameFrequency, "");
                 return;
             }
 
-            var color = "";
+            if (color == "")
+                color = "1";
 
             TriggerServerEvent("cs:engine:server:tracker:on", json["channel"].ToString(), json["name"].ToString(), color);
         }
@@ -130,6 +144,10 @@ namespace Client
             public Vector3 PedCoordinats;
         }
 
+        public void nuiNotify(string[] msg, string replace = null)
+        {
+            TriggerEvent(config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
+        }
 
     }
 }
