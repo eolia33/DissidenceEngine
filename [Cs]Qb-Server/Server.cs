@@ -31,18 +31,28 @@ namespace Server
 
             EventHandlers["cs:engine:server:qbcore:checkplayerdata"] += 
                 new Action<string>(noSql.playerDataManagement);
+
             EventHandlers["C#:Engine:Server:Bracelet:CheckPosition"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletCallFromClient);
+
             EventHandlers["C#:Engine:Server:Bracelet:PoliceNotification"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletNotificationForPlolice);
+
             EventHandlers["cs:engine:server:tracker:on"] +=
-                new Action<Player, string, string, string>(tracker.setNewGpsClient);
+                new Action<Player, string, string, string,int>(tracker.setNewGpsClient);
+
             EventHandlers["cs:engine:server:tracker:leave"] +=
                 new Action<Player, int>(tracker.userIsLeaving);
+
             EventHandlers["cs:engine:server:duty:tracker"] += 
                 new Action<string, bool>(tracker.userDuty);
+
+            EventHandlers["cs:engine:server:tracker:notification"] +=
+                new Action<Player,int>(tracker.userNotification);
+
             EventHandlers["playerDropped"] += 
                 new Action<Player, string>(tracker.OnPlayerDropped);
+
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] +=
                 new Action<Player>(sendingSecurityKey);
 

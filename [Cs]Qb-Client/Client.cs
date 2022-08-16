@@ -45,6 +45,9 @@ namespace Client
             EventHandlers["cs:engine:client:tracker:open"] += 
                 new Action(tracker.trackerOpen);
 
+            EventHandlers["cs:engine:client:tracker:ping"] +=
+                new Action<string, int,int>(tracker.trackerServerPing);
+
             EventHandlers["cs:engine:client:tracker:connected"] +=
                 new Action(tracker.trackerOk);
 
@@ -67,11 +70,12 @@ namespace Client
                     tracker.trackerSetColor(data);
                 });
 
-            RegisterCommand("test",
-                new Action<int, List<object>, string>((source, args, raw) =>
+            RegisterNuiCallbackType("cs:engine:client:tracker:notification");
+            EventHandlers["__cfx_nui:cs:engine:client:tracker:notification"] +=
+                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
                 {
-                    TriggerServerEvent("cs:engine:client:qbcore:checkplayerdata");
-                }), false);
+               TriggerServerEvent("cs:engine:server:tracker:notification", data["x"]);
+                });
 
             Tick += OnTick;
         }

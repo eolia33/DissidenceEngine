@@ -22,7 +22,7 @@ namespace Configuration
         public string[] m4 { get; set; }
         public string[] m5 { get; set; }
         public bool cerbere { get; set; }
-        public string radioAcessDeniedMsg { get; set; }
+
         public string notificationEngine { get; set; }
 
         public string[] msg_selfUserLeaveTracker { get; set; } = new string[3];
@@ -33,8 +33,10 @@ namespace Configuration
         public string[] msg_selfUserErrorFrequency { get; set; } = new string[3];
         public string[] msg_selfUserNameFrequency { get; set; } = new string[3];
         public string[] msg_selfUserNameFrequencyRestricted { get; set; } = new string[3];
-        public int pollingRate { get; set; }
-        public int blipSprite { get; set; }
+        public string[] msg_selfTrackerNotificationOn { get; set; } = new string[3];
+        public string[] msg_selfTrackerNotificationOff { get; set; } = new string[3];
+        public int trackerServerPollingRate { get; set; }
+        public int trackerBlipSprite { get; set; }
     }
 
     public class GpsDic
@@ -44,6 +46,7 @@ namespace Configuration
         public string PedName;
         public string PedFrequency;
         public string PedColor;
+        public int PedNotification;
         public float PedDirection;
         public Vector3 PedCoordinats;
     }
@@ -55,6 +58,7 @@ namespace Configuration
         public string PedName;
         public string PedFrequency;
         public string PedColor;
+        public int PedNotification;
         public float PedDirection;
         public Vector3 PedCoordinats;
     }

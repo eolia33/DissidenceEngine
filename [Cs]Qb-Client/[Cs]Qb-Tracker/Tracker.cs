@@ -63,7 +63,7 @@ namespace Client
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
             nuiState.visible = true;
             nuiState.mouse = true;
-            API.SendNuiMessage(jsonString);
+            SendNuiMessage(jsonString);
         }
 
         public void trackerOk()
@@ -71,38 +71,40 @@ namespace Client
             string jsonString = "{\"type\":\"On\",\"enable\":true}";
             nuiState.visible = true;
             nuiState.mouse = true;
-            API.SendNuiMessage(jsonString);
+            SendNuiMessage(jsonString);
         }
+
         public void trackerSetColor(IDictionary<string, object> json)
         {
             var math = Convert.ToInt32(json["x"]) +1;
             color = math.ToString();
         }
+
         public void trackerJoin(IDictionary<string, object> json)
         {
-
-            if (json["channel"] == "")
-            {
+            if(string.IsNullOrEmpty(json["channel"].ToString()))
+            { 
                 nuiNotify(config.msg_selfUserErrorFrequency, "");
                 trackerOff();
                 return;
             }
 
-            if (json["name"] == "")
+            if (string.IsNullOrEmpty(json["name"].ToString()))
             {
                 trackerOff();
                 nuiNotify(config.msg_selfUserNameFrequency, "");
                 return;
             }
 
-            if (color == "")
+            if (string.IsNullOrEmpty(color))
+            {
                 color = "1";
+            }
 
-            TriggerServerEvent("cs:engine:server:tracker:on", json["channel"].ToString(), json["name"].ToString(), color);
+         TriggerServerEvent("cs:engine:server:tracker:on", json["channel"].ToString(), json["name"].ToString(), color);
         }
 
-
-        private void gpsPositionsFromServer(string json, int pollingRate, int blipSprite)
+        public void trackerServerPing(string json, int pollingRate, int blipSprite)
         {
              Dictionary<string, GpsNetworkClient> gps = JsonConvert.DeserializeObject<Dictionary<string, GpsNetworkClient>>(json);
             foreach (var v in gps)
@@ -131,9 +133,10 @@ namespace Client
         }
         public async void removeBlip(int blip, int time)
         {
-            await Delay(time); //
+            await Delay(time);
             RemoveBlip(ref blip);
         }
+
 
         public class GpsNetworkClient
         {
@@ -143,7 +146,6 @@ namespace Client
             public float PedDirection;
             public Vector3 PedCoordinats;
         }
-
         public void nuiNotify(string[] msg, string replace = null)
         {
             TriggerEvent(config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
