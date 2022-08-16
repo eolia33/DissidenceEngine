@@ -1,0 +1,33 @@
+{
+ "s1": 911,
+ "s2": 2,
+ "s3":3,
+ "s4":4,
+ "s5":4,
+  "m1": ["police"],
+  "m2": ["police"],  
+  "m3": ["police"], 
+  "m4": ["police"],
+  "m5": ["police"],
+  "cerbere": false,
+
+ "trackerServerPollingRate" : 800,
+ "trackerBlipSprite" : 185,
+
+ "notificationEngine":"okokNotify:Alert",
+
+ "msg_selfUserJoinTracker" : ["WorldCom - Tracker","Vous êtes connecté sur la fréquence balise #{replace}","3000","success"],
+ "msg_otherUserJoinTracker" : ["WorldCom - Tracker","L'utilisateur {replace} est connecté sur votre fréquence balise","3000","info"],
+
+ "msg_selfUserLeaveTracker" : ["WorldCom - Tracker","Vous venez de quitter la réseau balise","3000","error"],
+ "msg_otherUserLeaveTracker" : ["WorldCom - Tracker","L'utilisateur {replace} vient de se déconnecté du réseau balise","3000","info"],
+ "msg_otherUserLeaveTrackerByForce" : ["WorldCom - Tracker","L'utilisateur {replace} vient de se faire retirer sa balise","3000","warning"],
+
+ "msg_selfUserErrorFrequency" : ["WorldCom - Tracker","Aucune fréquence balise spécifiée","3000","error"],
+ "msg_selfUserNameFrequency" : ["WorldCom - Tracker","Aucun nom d'utilisateur spécifié","3000","error"],
+ "msg_selfUserNameFrequencyRestricted" : ["WorldCom - Tracker","Cette fréquence est réservée","3000","error"],
+
+ "msg_selfTrackerNotificationOff" : ["WorldCom - Tracker","Notifications de balise désactivées","3000","info"],
+ "msg_selfTrackerNotificationOn" : ["WorldCom - Tracker","Notifications de balise activées","3000","info"],
+ "msg_otherUserJoinTracker" : ["WorldCom - Tracker","L'utilisateur {replace} est connecté sur votre fréquence balise","3000","info"]
+}
