@@ -20,7 +20,6 @@ namespace Server
 
         private PlayerNoSql insertGlobalNoSql(QbCore playerData)
         {
-            Debug.WriteLine("début de l'ajout des données dans le dictionnaire");
             var newPlayerClient = new PlayerNoSql
             {
                 name       = playerData.PlayerData.Name,
@@ -42,15 +41,11 @@ namespace Server
                 jobName    = playerData.PlayerData.Job.Name,
                 jobGrade   = playerData.PlayerData.Job.Grade.Name
             };
-
-            Debug.WriteLine("vérification des données, exemple licence : " + playerData.PlayerData.License);
-
             return newPlayerClient;
         }
 
         private void updateGlobalNoSql(QbCore playerData)
         {
-            Debug.WriteLine("Début de la maj des données du dictionnaire ");
             var linq = playerNoSql.Where(x => x.Value.license == playerData.PlayerData.License).First();
 
             playerNoSql[linq.Key].name       = playerData.PlayerData.Name;
@@ -76,11 +71,10 @@ namespace Server
 
         public void getDataFromQbCore(string id, string json)
         {
-            Debug.WriteLine("reception des données de QBcore");
+            Debug.WriteLine("\x1b[36m"+"[Receiving from BRIDGE(" +id.ToString()+")]");
 
             var playerData = QbCore.FromJson(json);
 
-            Debug.WriteLine(playerData.PlayerData.License);
             if (!playerNoSql.ContainsKey(playerData.PlayerData.License)) 
                 playerNoSql.Add(playerData.PlayerData.License, insertGlobalNoSql(playerData));
 

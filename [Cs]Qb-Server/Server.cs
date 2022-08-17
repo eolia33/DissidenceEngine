@@ -30,7 +30,7 @@ namespace Server
                 new Action<string, string>(noSql.getDataFromQbCore);
 
             EventHandlers["cs:engine:server:duty:tracker"] +=
-                new Action<string, string>(tracker.dutyTracker);
+                new Action<string,string>(tracker.dutySwitcher);
 
             EventHandlers["C#:Engine:Server:Bracelet:CheckPosition"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletCallFromClient);

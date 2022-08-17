@@ -137,7 +137,6 @@ namespace Server
             var linq    = gpsListing.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
             var colorOk = Convert.ToInt32(color) + 1;
             gpsListing[linq.Key].PedColor = colorOk.ToString();
-            Debug.WriteLine("changfement de couleur");
         }
 
 
@@ -153,43 +152,18 @@ namespace Server
 
         #region Is This Frequency Restricted ?
 
-        public void dutyTracker(string id, string status )
+        public void dutySwitcher(string id, string status )
         {
-            var linqNoSql = playerNoSql.Where(x => x.Value.id == id).First();
+            var linqNoSql = playerNoSql.SingleOrDefault(x => x.Value.id == id);
             linqNoSql.Value.jobOnDuty = status;
 
-            var linqIsCOnnect = gpsListing.Where(x => x.Value.PedId == id);
-           
-            if(linqIsCOnnect.Any())
+            var tracker = gpsListing.SingleOrDefault(x => x.Value.PedId == id );
+
+            if (tracker.Value.PedId != null)
             {
-                foreach (var item in linqIsCOnnect)
-                {
-                   // if (isRestricted(item.Value.PedFrequency, id))
-                        // userIsLeaving(id, item.Value.PedLicence, 3);
-
-                }
+                if (isRestricted(tracker.Value.PedFrequency, tracker.Value.PedId, tracker.Value.PedLicence))
+                    userIsLeaving(tracker.Value.PedId, tracker.Value.PedLicence, 3);
             }
-           
-
-
-
-        }
-        public void playerJob(string job, string id)
-        {
-            Debug.WriteLine(job);
-            var welcome6 = QbCore.FromJson(job);
-            Debug.WriteLine(welcome6.PlayerData.Name);
-        }
-
-        public bool checkPlayerJob(Player player)
-        {
-            for (var i = 0; i < 5; i++)
-                if (!awaiting)
-                    return true;
-                else
-                    Thread.Sleep(100);
-
-            return false;
         }
 
         public bool isRestricted(string frequency, string id, string licence)
@@ -242,7 +216,6 @@ namespace Server
 
                         foreach (var result in linq)
                         {
-                            Debug.WriteLine(result.Value.PedColor.ToString());
                             gpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
                             {
                                 PedId         = result.Value.PedId,
