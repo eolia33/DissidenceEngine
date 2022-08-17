@@ -73,19 +73,16 @@ var checkbox = document.getElementById('toggle');
 checkbox.addEventListener('change', function() {
 
     var checkbox = document.getElementById('toggle');
+    var isChecked = checkbox.checked;
     if(isChecked){
              var checkboxb = document.getElementById('notification');
              var isCheckedb = checkboxb.checked;
              var valueNotification = 0;
 
-             var isCheckedb = checkboxb.checked;
-
              if(isCheckedb)
              valueNotification = 1;
              else
              valueNotification = 0;
-
-
              
              $.post('https://engine/cs:engine:client:tracker:join', JSON.stringify({
                 channel: $("#channel").val(),
