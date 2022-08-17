@@ -10,15 +10,17 @@ namespace Server
 {
     public class BridgeQBCore : BaseScript
     {
-        public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
+        public Dictionary<string, PlayerNoSql> playerNoSql { get; set; }
 
-        public BridgeQBCore(Dictionary<string, PlayerNoSql> _playersNoSql)
+        public BridgeQBCore()
         {
-            playersNoSql = _playersNoSql;
+            var _playerNoSql = new Dictionary<string, PlayerNoSql>();
+            playerNoSql = _playerNoSql;
         }
 
         private PlayerNoSql insertGlobalNoSql(QbCore playerData)
         {
+            Debug.WriteLine("début de l'ajout des données dans le dictionnaire");
             var newPlayerClient = new PlayerNoSql
             {
                 name       = playerData.PlayerData.Name,
@@ -41,46 +43,50 @@ namespace Server
                 jobGrade   = playerData.PlayerData.Job.Grade.Name
             };
 
+            Debug.WriteLine("vérification des données, exemple licence : " + playerData.PlayerData.License);
+
             return newPlayerClient;
         }
 
         private void updateGlobalNoSql(QbCore playerData)
         {
-            var linq = playersNoSql.Where(x => x.Value.license == playerData.PlayerData.License).First();
+            Debug.WriteLine("Début de la maj des données du dictionnaire ");
+            var linq = playerNoSql.Where(x => x.Value.license == playerData.PlayerData.License).First();
 
-            playersNoSql[linq.Key].name       = playerData.PlayerData.Name;
-            playersNoSql[linq.Key].id         = playerData.PlayerData.Id.ToString();
-            playersNoSql[linq.Key].license    = playerData.PlayerData.License;
-            playersNoSql[linq.Key].gangName   = playerData.PlayerData.Gang.Name;
-            playersNoSql[linq.Key].gangIsboss = playerData.PlayerData.Gang.Isboss.ToString();
-            playersNoSql[linq.Key].gangLabel  = playerData.PlayerData.Gang.Label;
-            playersNoSql[linq.Key].gangGrade  = playerData.PlayerData.Gang.Grade.Name;
-            playersNoSql[linq.Key].citizenid  = playerData.PlayerData.Citizenid;
-            playersNoSql[linq.Key].birthdate  = playerData.PlayerData.Charinfo.Birthdate.ToString();
-            playersNoSql[linq.Key].phone      = playerData.PlayerData.Charinfo.Phone.ToString();
-            playersNoSql[linq.Key].cid        = playerData.PlayerData.Charinfo.Cid.ToString();
-            playersNoSql[linq.Key].firstname  = playerData.PlayerData.Charinfo.Firstname;
-            playersNoSql[linq.Key].lastname   = playerData.PlayerData.Charinfo.Lastname;
-            playersNoSql[linq.Key].gender     = playerData.PlayerData.Charinfo.Gender.ToString();
-            playersNoSql[linq.Key].account    = playerData.PlayerData.Charinfo.Account;
-            playersNoSql[linq.Key].jobOnDuty  = playerData.PlayerData.Job.Onduty.ToString();
-            playersNoSql[linq.Key].jobName    = playerData.PlayerData.Job.Name;
-            playersNoSql[linq.Key].jobGrade   = playerData.PlayerData.Job.Grade.Name;
+            playerNoSql[linq.Key].name       = playerData.PlayerData.Name;
+            playerNoSql[linq.Key].id         = playerData.PlayerData.Id.ToString();
+            playerNoSql[linq.Key].license    = playerData.PlayerData.License;
+            playerNoSql[linq.Key].gangName   = playerData.PlayerData.Gang.Name;
+            playerNoSql[linq.Key].gangIsboss = playerData.PlayerData.Gang.Isboss.ToString();
+            playerNoSql[linq.Key].gangLabel  = playerData.PlayerData.Gang.Label;
+            playerNoSql[linq.Key].gangGrade  = playerData.PlayerData.Gang.Grade.Name;
+            playerNoSql[linq.Key].citizenid  = playerData.PlayerData.Citizenid;
+            playerNoSql[linq.Key].birthdate  = playerData.PlayerData.Charinfo.Birthdate.ToString();
+            playerNoSql[linq.Key].phone      = playerData.PlayerData.Charinfo.Phone.ToString();
+            playerNoSql[linq.Key].cid        = playerData.PlayerData.Charinfo.Cid.ToString();
+            playerNoSql[linq.Key].firstname  = playerData.PlayerData.Charinfo.Firstname;
+            playerNoSql[linq.Key].lastname   = playerData.PlayerData.Charinfo.Lastname;
+            playerNoSql[linq.Key].gender     = playerData.PlayerData.Charinfo.Gender.ToString();
+            playerNoSql[linq.Key].account    = playerData.PlayerData.Charinfo.Account;
+            playerNoSql[linq.Key].jobOnDuty  = playerData.PlayerData.Job.Onduty.ToString();
+            playerNoSql[linq.Key].jobName    = playerData.PlayerData.Job.Name;
+            playerNoSql[linq.Key].jobGrade   = playerData.PlayerData.Job.Grade.Name;
         }
 
 
-        public void getDataFromQbCore(string json)
+        public void getDataFromQbCore(string id, string json)
         {
+            Debug.WriteLine("reception des données de QBcore");
+
             var playerData = QbCore.FromJson(json);
 
-            if (!playersNoSql.ContainsKey(playerData.PlayerData.License))
-                playersNoSql.Add(playerData.PlayerData.License, insertGlobalNoSql(playerData));
+            Debug.WriteLine(playerData.PlayerData.License);
+            if (!playerNoSql.ContainsKey(playerData.PlayerData.License)) 
+                playerNoSql.Add(playerData.PlayerData.License, insertGlobalNoSql(playerData));
 
             else
                 updateGlobalNoSql(playerData);
 
-
-            sendDataToClient(playerData, playerData.PlayerData.Id.ToString());
         }
 
         public void sendDataToClient(QbCore playerData, string playerid)

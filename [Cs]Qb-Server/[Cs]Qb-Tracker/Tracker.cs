@@ -16,18 +16,17 @@ namespace Server
         public int _serverId;
         public int _playerId;
         public SharedConfig config;
-        public BridgeQBCore bridgeQBcore;
         public bool awaiting { get; set; }
         public Dictionary<string, GpsDic> gpsListing { get; set; }
-        public Dictionary<string, PlayerNoSql> playersNoSql { get; set; }
+        public Dictionary<string, PlayerNoSql> playerNoSql { get; set; }
         public List<string> frequencyList { get; set; }
 
-        public Tracker(SharedConfig _config, BridgeQBCore _bridgeQBcore)
+        public Tracker(SharedConfig _config, BridgeQBCore bridge)
         {
             config       = _config;
-            bridgeQBcore = _bridgeQBcore;
+            playerNoSql = bridge.playerNoSql;
 
-            var _frequencyList = new List<string>();
+             var _frequencyList = new List<string>();
             var _gpsListing    = new Dictionary<string, GpsDic>();
 
             frequencyList = _frequencyList;
@@ -36,47 +35,27 @@ namespace Server
             _ = Task.Run(() => { gpsListeningClients(gpsListing, frequencyList); });
         }
 
-        #region IsConnecting / IsUpdatingSettings²
+        #region Connecting to Tracker
 
-        public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color,
-            int notification)
+        public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color,int notification)
         {
             var id        = player.Handle;
             var licence   = player.Identifiers["license"];
             var canAccess = true;
 
-
-            var linqD = config.restrictedFrequencies.Where(x => x.frequency == frequency);
-
-            foreach (var item in config.restrictedFrequencies.Where(x => x.frequency == frequency))
+            if (isRestricted(frequency, id,licence))
             {
-                canAccess = false;
-
-                foreach (var jobs in item.jobs)
-                {
-                    if (frequency == jobs && item.onduty == false)
-                    {
-                        canAccess = true;
-                        break;
-                    }
-
-                    if (frequency == jobs && item.onduty == true && frequency == "onduty")
-                    {
-                        canAccess = true;
-                        break;
-                    }
-                }
+                nuiNotify(id, config.msg_selfUserNameFrequencyRestricted, 1, "");
+                return;
             }
 
             if (!frequencyList.Contains(frequency))
-            {
                 frequencyList.Add(frequency);
-            }
             else
             {
                 var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedNotification == 1);
                 foreach (var result in linq)
-                    nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1, "");
+                nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1, "");
             }
 
             nuiNotify(id, config.msg_selfUserJoinTracker, 1, frequency);
@@ -84,27 +63,27 @@ namespace Server
             Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
 
             if (!gpsListing.ContainsKey(licence))
-                gpsListing.Add(licence,
-                               dictionaryConstruct(licence,                           id, name, frequency, notification,
-                                                   GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
+                gpsListing.Add(licence,dictionaryConstruct(licence,id, name, frequency, notification,GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
             else
-                dictionaryUpdate(licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color,
-                                 1);
+                dictionaryUpdate(licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color,1);
 
             await Task.FromResult(0);
         }
 
         #endregion
 
-        #region IsDisconnecting / Is Leaving
+        #region Leaving Tracker
 
-        public void OnPlayerDropped([FromSource] Player player, string reason)
+        public void userLeaving([FromSource] Player player, int reason)
+        {
+            userIsLeaving(player.Handle, player.Identifiers["license"], reason);
+        }
+
+        public void userIsLeaving(string id, string licence, int reason)
         {
             try
             {
-                var licence = player.Identifiers["license"];
-                var linq    = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
-
+                var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
                 if (linq.Value.PedLicence != null)
                 {
                     if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
@@ -115,41 +94,18 @@ namespace Server
                     var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency &&
                                                       x.Value.PedNotification == 1);
 
-                    foreach (var result in linqb)
-                        nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTracker, 1, result.Value.PedName);
-                }
-            }
-
-            catch (Exception)
-            {
-            }
-        }
-
-        public void userColorChange([FromSource] Player player, string color)
-        {
-            var linq    = gpsListing.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
-            var colorOk = Convert.ToInt32(color) + 1;
-            gpsListing[linq.Key].PedColor = colorOk.ToString();
-            Debug.WriteLine("changfement de couleur");
-        }
-
-        public void userIsLeaving([FromSource] Player player, int reason)
-        {
-            try
-            {
-                var licence = player.Identifiers["license"];
-                var linq    = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
-                if (linq.Value.PedLicence != null)
-                {
-                    if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
-                        frequencyList.Remove(linq.Value.PedFrequency);
-
-                    gpsListing.Remove(linq.Value.PedLicence);
-
-                    nuiNotify(player.Handle, config.msg_selfUserLeaveTracker, 1, "");
-
-                    var linqb = gpsListing.Where(x => x.Value.PedFrequency == linq.Value.PedFrequency &&
-                                                      x.Value.PedNotification == 1);
+                    switch (reason)
+                    {
+                        case 1:
+                            nuiNotify(id, config.msg_selfUserLeaveTracker, 1, "");
+                            break;
+                        case 2:
+                            nuiNotify(id, config.msg_selfUserLeaveTracker, 1, "");
+                            break;
+                        case 3:
+                            nuiNotify(id, config.msg_selfUserLeaveTrackerDuty, 1, "");
+                            break;
+                    }
 
                     foreach (var result in linqb)
                         switch (reason)
@@ -163,6 +119,11 @@ namespace Server
                                 nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTrackerByForce, 1,
                                           result.Value.PedName);
                                 break;
+
+                            case 3:
+                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTrackerByDuty, 1,
+                                          result.Value.PedName);
+                                break;
                         }
                 }
             }
@@ -170,6 +131,15 @@ namespace Server
             {
             }
         }
+
+        public void userColorChange([FromSource] Player player, string color)
+        {
+            var linq    = gpsListing.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
+            var colorOk = Convert.ToInt32(color) + 1;
+            gpsListing[linq.Key].PedColor = colorOk.ToString();
+            Debug.WriteLine("changfement de couleur");
+        }
+
 
         public bool isItTheLastManStanding(string frequency, string pedId)
         {
@@ -181,8 +151,29 @@ namespace Server
 
         #endregion
 
-        #region IsProtectedFrequence
+        #region Is This Frequency Restricted ?
 
+        public void dutyTracker(string id, string status )
+        {
+            var linqNoSql = playerNoSql.Where(x => x.Value.id == id).First();
+            linqNoSql.Value.jobOnDuty = status;
+
+            var linqIsCOnnect = gpsListing.Where(x => x.Value.PedId == id);
+           
+            if(linqIsCOnnect.Any())
+            {
+                foreach (var item in linqIsCOnnect)
+                {
+                   // if (isRestricted(item.Value.PedFrequency, id))
+                        // userIsLeaving(id, item.Value.PedLicence, 3);
+
+                }
+            }
+           
+
+
+
+        }
         public void playerJob(string job, string id)
         {
             Debug.WriteLine(job);
@@ -201,31 +192,38 @@ namespace Server
             return false;
         }
 
-        public bool isThisFrequencyProtected(int frequency, Player player)
+        public bool isRestricted(string frequency, string id, string licence)
         {
-            if (frequency == config.s1)
+            var linqFrequency = config.restrictedFrequencies.Where(x => x.frequency == frequency);
+
+            if (linqFrequency.Any())
             {
-                checkPlayerJob(player);
+                    var linqNoSql = playerNoSql.FirstOrDefault(x => x.Key.Contains(licence));
 
-                foreach (var f in config.m1)
-                    if ("tot" == f)
-                        return false;
-
+                    foreach (var _frequency in linqFrequency)
+                    {
+                        if (_frequency.frequency == frequency)
+                        {
+                            foreach (var job in _frequency.jobs)
+                            {
+                            if (job == linqNoSql.Value.jobName) 
+                                if (linqNoSql.Value.jobOnDuty == "True")
+                                    return false;     
+                            }
+                        }
+                    }
                 return true;
             }
-
             return false;
         }
+                #endregion
 
-        #endregion
-
-        #region Task for GPS refreshing
+        #region Background Tracker Engine
 
         private Task gpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
         {
             while (true)
             {
-                Debug.WriteLine(frequencyList.Count().ToString());
                 foreach (var entry in gpsListing)
                 {
                     entry.Value.PedCoordinats = GetEntityCoords(GetPlayerPed(entry.Value.PedId));
@@ -270,7 +268,7 @@ namespace Server
 
         #endregion
 
-        #region Gps Core
+        #region Tracker Functions / Other
 
         public GpsDic dictionaryConstruct(string licence, string id, string name, string frequency, int notification,
             Vector3 vector,
@@ -304,7 +302,6 @@ namespace Server
             gpsListing[linq.Key].PedNotification = notification;
         }
 
-        #endregion
 
         public class GpsNetworkClient
         {
@@ -315,6 +312,9 @@ namespace Server
             public Vector3 PedCoordinats;
         }
 
+        #endregion
+
+        #region NUI / Notifications system
         public void nuiNotify(string player, string[] msg, int type, string replace = null)
         {
             switch (type)
@@ -346,5 +346,7 @@ namespace Server
                     break;
             }
         }
+
+        #endregion
     }
 }

@@ -89,12 +89,10 @@ namespace Client
                 });
 
 
-            RegisterCommand("car", new Action<string>((source) =>
+            RegisterCommand("duty", new Action<string>((source) =>
             {
-                Debug.WriteLine("Alors coté client n°" + GetPlayerServerId(player.Handle));
-                TriggerServerEvent("cs:engine:client:qbcore:checkplayerdata", GetPlayerServerId(player.Handle));
+                TriggerServerEvent("QBCore:ToggleDuty", GetPlayerServerId(player.Handle));
             }), false);
-
 
             Tick += OnTick;
         }
@@ -149,8 +147,11 @@ namespace Client
                 TriggerServerEvent("C#:Engine:Server:Bracelet:CheckPosition" + template, player.ServerId, targetId);
             }), false);
 
+            RegisterCommand("dataupdate", new Action<int, List<object>, string>((source, args, raw) =>
+            {
+                TriggerServerEvent("cs:engine:client:qbcore:getdata", GetPlayerServerId(player.Handle));
+            }), false);
 
-            //TriggerServerEvent("M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd" + template);
         }
 
         private void getZone()
