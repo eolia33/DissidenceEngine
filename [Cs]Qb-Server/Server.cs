@@ -9,28 +9,28 @@ using static CitizenFX.Core.Native.API;
 namespace Server
 {
     public class Server : BaseScript
-    {  public SharedConfig config { get; }
+    {
+        public SharedConfig config { get; }
         public Dictionary<string, PlayerNoSql> bridgeQbCore { get; set; }
         public string securityKey { get; set; }
 
         public Server()
         {
-            Debug.WriteLine("c# engine is Starting");
             config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
-                "config.json"));
+                                                                     "config.json"));
 
             var _bridgeQbCore = new Dictionary<string, PlayerNoSql>();
 
             bridgeQbCore = _bridgeQbCore;
 
-            var noSql = new BridgeQBCore(bridgeQbCore);
-            var tracker = new Tracker(config, noSql);
+            var noSql    = new BridgeQBCore(bridgeQbCore);
+            var tracker  = new Tracker(config, noSql);
             var bracelet = new Bracelet();
 
             #region EventHandlers
 
-            EventHandlers["cs:engine:server:qbcore:checkplayerdata"] += 
-                new Action<string>(noSql.playerDataManagement);
+            EventHandlers["cs:engine:server:playerdata:update"] +=
+                new Action<string>(noSql.getDataFromQbCore);
 
             EventHandlers["C#:Engine:Server:Bracelet:CheckPosition"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletCallFromClient);
@@ -39,20 +39,18 @@ namespace Server
                 new Action<string, string>(bracelet.getSecurityBraceletNotificationForPlolice);
 
             EventHandlers["cs:engine:server:tracker:on"] +=
-                new Action<Player, string, string, string,int>(tracker.setNewGpsClient);
+                new Action<Player, string, string, string, int>(tracker.setNewGpsClient);
 
             EventHandlers["cs:engine:server:tracker:leave"] +=
                 new Action<Player, int>(tracker.userIsLeaving);
 
-           // new Action<string, bool>(tracker.userDuty);
-
             EventHandlers["cs:engine:server:tracker:color:change"] +=
-                new Action<Player,string>(tracker.userColorChange);
+                new Action<Player, string>(tracker.userColorChange);
 
             EventHandlers["cs:engine:server:tracker:notification"] +=
-                new Action<Player,int>(tracker.userNotification);
+                new Action<Player, int>(tracker.userNotification);
 
-            EventHandlers["playerDropped"] += 
+            EventHandlers["playerDropped"] +=
                 new Action<Player, string>(tracker.OnPlayerDropped);
 
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] +=
@@ -61,13 +59,14 @@ namespace Server
             #endregion
         }
 
+
         #region EventTriggerProtection
 
         private string eventProtection()
         {
             var keyBase = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             var keySize = new char[50];
-            var random = new Random();
+            var random  = new Random();
 
             for (var i = 0; i < keySize.Length; i++) keySize[i] = keyBase[random.Next(keyBase.Length)];
 

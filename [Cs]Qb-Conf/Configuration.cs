@@ -24,7 +24,6 @@ namespace Configuration
         public bool cerbere { get; set; }
 
         public string notificationEngine { get; set; }
-
         public string[] msg_selfUserLeaveTracker { get; set; } = new string[3];
         public string[] msg_otherUserLeaveTracker { get; set; } = new string[3];
         public string[] msg_otherUserLeaveTrackerByForce { get; set; } = new string[3];
@@ -37,6 +36,15 @@ namespace Configuration
         public string[] msg_selfTrackerNotificationOff { get; set; } = new string[3];
         public int trackerServerPollingRate { get; set; }
         public int trackerBlipSprite { get; set; }
+        public List<RestrictedFrequencies>restrictedFrequencies { get; set; }
+
+    }
+
+    public class RestrictedFrequencies
+    {
+        public string frequency { get; set; }
+        public bool onduty { get; set; }
+        public List<string> jobs { get; set; }
     }
 
     public class GpsDic
@@ -66,24 +74,23 @@ namespace Configuration
     public class PlayerNoSql
     {
         public string name;
-        public long id;
-        public string license;
+        public string id;
         public string gangName;
-        public bool gangIsboss;
+        public string gangIsboss;
         public string gangLabel;
-        public string gangGrade;
-        public string job;
         public string citizenid;
-        public string birthdate;
-        public long phone;
-        public long cid;
+        public string phone;
+        public string cid;
         public string firstname;
         public string lastname;
-        public long gender;
-        public string account;
-        public bool jobOnDuty;
+        public string gender;
+        public string jobOnDuty;
         public string jobName;
         public string jobGrade;
+        public string license;
+        public string gangGrade;
+        public string birthdate;
+        public string account;
     }
     public class NuiState
     {
