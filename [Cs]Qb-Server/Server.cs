@@ -51,7 +51,7 @@ namespace Server
                 new Action<Player, int>(tracker.userNotification);
 
             EventHandlers["playerDropped"] +=
-                new Action<Player,int>(tracker.userLeaving);
+                new Action<Player,string>(tracker.userLeavingDrop);
 
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] +=
                 new Action<Player>(sendingSecurityKey);

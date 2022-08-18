@@ -52,6 +52,9 @@ namespace Client
             EventHandlers["cs:engine:client:tracker:connected"] +=
                 new Action(tracker.trackerOk);
 
+            EventHandlers["cs:engine:client:tracker:off:forced"] +=
+                new Action<int>(tracker.trackerLeave);
+
             RegisterNuiCallbackType("cs:engine:client:tracker:close");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerClose(); });
@@ -62,7 +65,7 @@ namespace Client
 
             RegisterNuiCallbackType("cs:engine:client:tracker:leave");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:leave"] +=
-                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerLeave(); });
+                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerLeave(1); });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:color");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:color"] +=

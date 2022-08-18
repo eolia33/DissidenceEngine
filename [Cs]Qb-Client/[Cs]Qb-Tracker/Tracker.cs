@@ -17,7 +17,6 @@ namespace Client
     {
         public SharedConfig config { get; set; }
         public Player player { get; set; }
-
         public string color { get; set; }
         public NuiState nuiState { get; set; }
 
@@ -46,13 +45,24 @@ namespace Client
             SendNuiMessage(jsonString);
         }
 
-        public void trackerLeave()
+        public void trackerLeave(int type)
         {
+            Debug.WriteLine("client off command type " + type);
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
-            nuiState.visible = true;
-            nuiState.mouse   = true;
+            if (type == 2)
+            {
+                nuiState.visible = false;
+                nuiState.mouse = false;
+            }
+            else
+            {
+                nuiState.visible = true;
+                nuiState.mouse = true;
+            }
             SendNuiMessage(jsonString);
-            TriggerServerEvent("cs:engine:server:tracker:leave", "1");
+
+            if(type == 2)
+                TriggerServerEvent("cs:engine:server:tracker:leave", "1");
         }
 
 

@@ -15,6 +15,7 @@ namespace Server
     {
         public int _serverId;
         public int _playerId;
+        public string licence;
         public SharedConfig config;
         public bool awaiting { get; set; }
         public Dictionary<string, GpsDic> gpsListing { get; set; }
@@ -25,8 +26,10 @@ namespace Server
         {
             config       = _config;
             playerNoSql = bridge.playerNoSql;
+            var _licence = "";
+            licence = _licence;
 
-             var _frequencyList = new List<string>();
+            var _frequencyList = new List<string>();
             var _gpsListing    = new Dictionary<string, GpsDic>();
 
             frequencyList = _frequencyList;
@@ -40,12 +43,13 @@ namespace Server
         public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color,int notification)
         {
             var id        = player.Handle;
-            var licence   = player.Identifiers["license"];
+            licence   = player.Identifiers["license"];
             var canAccess = true;
 
             if (isRestricted(frequency, id,licence))
             {
                 nuiNotify(id, config.msg_selfUserNameFrequencyRestricted, 1, "");
+                Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:off:forced",1);
                 return;
             }
 
@@ -63,9 +67,14 @@ namespace Server
             Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
 
             if (!gpsListing.ContainsKey(licence))
-                gpsListing.Add(licence,dictionaryConstruct(licence,id, name, frequency, notification,GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
+            {
+                gpsListing.Add(licence, dictionaryConstruct(licence, id, name, frequency, notification, GetEntityCoords(GetPlayerPed(id)), color, 1, 0));
+                var r = gpsListing.Count().ToString();
+            }
             else
-                dictionaryUpdate(licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color,1);
+            {
+                dictionaryUpdate(licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color, 1);
+            }
 
             await Task.FromResult(0);
         }
@@ -74,16 +83,20 @@ namespace Server
 
         #region Leaving Tracker
 
-        public void userLeaving([FromSource] Player player, int reason)
+        public void userLeaving([FromSource] Player player,int reason)
         {
-            userIsLeaving(player.Handle, player.Identifiers["license"], reason);
+            userIsLeaving(player.Handle, player.Identifiers["license"], 1);
         }
-
+        public void userLeavingDrop([FromSource] Player player, string reason)
+        {
+            userIsLeaving(player.Handle, player.Identifiers["license"],1);
+        }
         public void userIsLeaving(string id, string licence, int reason)
         {
-            try
+            if (gpsListing.Count() > 0)
             {
-                var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
+                var linq = gpsListing.FirstOrDefault(x => x.Key.Contains(licence));
+
                 if (linq.Value.PedLicence != null)
                 {
                     if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
@@ -106,7 +119,6 @@ namespace Server
                             nuiNotify(id, config.msg_selfUserLeaveTrackerDuty, 1, "");
                             break;
                     }
-
                     foreach (var result in linqb)
                         switch (reason)
                         {
@@ -126,9 +138,6 @@ namespace Server
                                 break;
                         }
                 }
-            }
-            catch (Exception)
-            {
             }
         }
 
@@ -154,24 +163,34 @@ namespace Server
 
         public void dutySwitcher(string id, string status )
         {
-            var linqNoSql = playerNoSql.SingleOrDefault(x => x.Value.id == id);
-            linqNoSql.Value.jobOnDuty = status;
+            if (status == "True")
+                return;
 
-            var tracker = gpsListing.SingleOrDefault(x => x.Value.PedId == id );
+                var linqNoSql = playerNoSql.FirstOrDefault(x => x.Key.Contains(licence));
 
-            if (tracker.Value.PedId != null)
+            if (linqNoSql.Key != null)
             {
-                if (isRestricted(tracker.Value.PedFrequency, tracker.Value.PedId, tracker.Value.PedLicence))
-                    userIsLeaving(tracker.Value.PedId, tracker.Value.PedLicence, 3);
+                linqNoSql.Value.jobOnDuty = status;
+
+                var tracker = gpsListing.FirstOrDefault(x => x.Key.Contains(licence));
+
+                if (tracker.Key != null)
+                {
+                    Debug.WriteLine("ceci est mon id" + id);
+                    Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:off:forced", 2);
+                    userIsLeaving(linqNoSql.Value.id, licence,3);
+                }
             }
-        }
+
+         }
 
         public bool isRestricted(string frequency, string id, string licence)
         {
-            var linqFrequency = config.restrictedFrequencies.Where(x => x.frequency == frequency);
 
-            if (linqFrequency.Any())
-            {
+                var linqFrequency = config.restrictedFrequencies.Where(x => x.frequency == frequency);
+
+                if (linqFrequency.Any())
+                {
                     var linqNoSql = playerNoSql.FirstOrDefault(x => x.Key.Contains(licence));
 
                     foreach (var _frequency in linqFrequency)
@@ -180,15 +199,18 @@ namespace Server
                         {
                             foreach (var job in _frequency.jobs)
                             {
-                            if (job == linqNoSql.Value.jobName) 
-                                if (linqNoSql.Value.jobOnDuty == "True")
-                                    return false;     
+                                if (job == linqNoSql.Value.jobName)
+                                    if (linqNoSql.Value.jobOnDuty == "True")
+                                        return false;
                             }
                         }
                     }
-                return true;
-            }
-            return false;
+                    return true;
+                }
+                return false;
+
+        return false;
+
         }
                 #endregion
 
