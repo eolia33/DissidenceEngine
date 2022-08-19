@@ -11,7 +11,6 @@ namespace Server
     public class Server : BaseScript
     {
         public SharedConfig config { get; }
-        public Dictionary<string, PlayerNoSql> bridgeQbCore { get; set; }
         public string securityKey { get; set; }
 
         public Server()
@@ -19,18 +18,19 @@ namespace Server
             config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
                                                                      "config.json"));
 
-            var _bridgeQbCore = new Dictionary<string, PlayerNoSql>();
 
-            bridgeQbCore = _bridgeQbCore;
-
-            var noSql    = new BridgeQBCore(bridgeQbCore);
+            var noSql    = new BridgeQBCore();
             var tracker  = new Tracker(config, noSql);
             var bracelet = new Bracelet();
 
-            #region EventHandlers
+        #region EventHandlers
+
 
             EventHandlers["cs:engine:server:playerdata:update"] +=
-                new Action<string>(noSql.getDataFromQbCore);
+                new Action<string, string>(noSql.getDataFromQbCore);
+
+            EventHandlers["cs:engine:server:duty:tracker"] +=
+                new Action<string,string>(tracker.dutySwitcher);
 
             EventHandlers["C#:Engine:Server:Bracelet:CheckPosition"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletCallFromClient);
@@ -42,7 +42,7 @@ namespace Server
                 new Action<Player, string, string, string, int>(tracker.setNewGpsClient);
 
             EventHandlers["cs:engine:server:tracker:leave"] +=
-                new Action<Player, int>(tracker.userIsLeaving);
+                new Action<Player,int>(tracker.userLeaving);
 
             EventHandlers["cs:engine:server:tracker:color:change"] +=
                 new Action<Player, string>(tracker.userColorChange);
@@ -51,7 +51,7 @@ namespace Server
                 new Action<Player, int>(tracker.userNotification);
 
             EventHandlers["playerDropped"] +=
-                new Action<Player, string>(tracker.OnPlayerDropped);
+                new Action<Player,string>(tracker.userLeavingDrop);
 
             EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] +=
                 new Action<Player>(sendingSecurityKey);

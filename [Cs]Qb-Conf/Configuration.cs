@@ -25,8 +25,11 @@ namespace Configuration
 
         public string notificationEngine { get; set; }
         public string[] msg_selfUserLeaveTracker { get; set; } = new string[3];
+
+        public string[] msg_selfUserLeaveTrackerDuty { get; set; } = new string[3];
         public string[] msg_otherUserLeaveTracker { get; set; } = new string[3];
         public string[] msg_otherUserLeaveTrackerByForce { get; set; } = new string[3];
+        public string[] msg_otherUserLeaveTrackerByDuty { get; set; } = new string[3];
         public string[] msg_selfUserJoinTracker { get; set; } = new string[3];
         public string[] msg_otherUserJoinTracker { get; set; } = new string[3];
         public string[] msg_selfUserErrorFrequency { get; set; } = new string[3];

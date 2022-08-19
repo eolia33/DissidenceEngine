@@ -52,6 +52,9 @@ namespace Client
             EventHandlers["cs:engine:client:tracker:connected"] +=
                 new Action(tracker.trackerOk);
 
+            EventHandlers["cs:engine:client:tracker:off:forced"] +=
+                new Action<int>(tracker.trackerLeave);
+
             RegisterNuiCallbackType("cs:engine:client:tracker:close");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerClose(); });
@@ -62,7 +65,7 @@ namespace Client
 
             RegisterNuiCallbackType("cs:engine:client:tracker:leave");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:leave"] +=
-                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerLeave(); });
+                new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerLeave(1); });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:color");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:color"] +=
@@ -89,12 +92,10 @@ namespace Client
                 });
 
 
-            RegisterCommand("car", new Action<string>((source) =>
+            RegisterCommand("duty", new Action<string>((source) =>
             {
-                Debug.WriteLine("Alors coté client n°" + GetPlayerServerId(player.Handle));
-                TriggerServerEvent("cs:engine:client:qbcore:checkplayerdata", GetPlayerServerId(player.Handle));
+                TriggerServerEvent("QBCore:ToggleDuty", GetPlayerServerId(player.Handle));
             }), false);
-
 
             Tick += OnTick;
         }
@@ -149,8 +150,11 @@ namespace Client
                 TriggerServerEvent("C#:Engine:Server:Bracelet:CheckPosition" + template, player.ServerId, targetId);
             }), false);
 
+            RegisterCommand("dataupdate", new Action<int, List<object>, string>((source, args, raw) =>
+            {
+                TriggerServerEvent("cs:engine:client:qbcore:getdata", GetPlayerServerId(player.Handle));
+            }), false);
 
-            //TriggerServerEvent("M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd" + template);
         }
 
         private void getZone()
