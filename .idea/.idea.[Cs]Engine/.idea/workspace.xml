@@ -7,7 +7,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ade33172-a4c1-49e0-bdff-0470b952a16c" name="Changes" comment="" />
+    <list default="true" id="ade33172-a4c1-49e0-bdff-0470b952a16c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/Math.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/packages.config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/packages.config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Shared/Json.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Tracker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Tracker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/packages.config" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,18 +39,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C#" />
-    <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -47,11 +57,27 @@
       <workItem from="1660648623526" duration="455000" />
       <workItem from="1660651148329" duration="879000" />
       <workItem from="1660695346142" duration="1219000" />
+      <workItem from="1660833132928" duration="1659000" />
+      <workItem from="1660843727351" duration="532000" />
+      <workItem from="1660942636890" duration="1324000" />
+      <workItem from="1660945581130" duration="231000" />
+      <workItem from="1660946046987" duration="20000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

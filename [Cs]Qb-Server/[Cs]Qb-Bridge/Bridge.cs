@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using CitizenFX.Core;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using Configuration;
+using System;
+
 
 namespace Server
 {
     public class BridgeQBCore : BaseScript
     {
         public Dictionary<string, PlayerNoSql> playerNoSql { get; set; }
+        public Server                          server      { get; set; }
 
-        public BridgeQBCore()
+        public BridgeQBCore(Server _server)
         {
             var _playerNoSql = new Dictionary<string, PlayerNoSql>();
             playerNoSql = _playerNoSql;
+            server      = _server;
         }
 
         private PlayerNoSql insertGlobalNoSql(PlayerData playerData)
@@ -44,7 +47,7 @@ namespace Server
             return newPlayerClient;
         }
 
-        private void updateGlobalNoSql(PlayerData  playerData)
+        private void updateGlobalNoSql(PlayerData playerData)
         {
             var linq = playerNoSql.Where(x => x.Value.license == playerData.License).First();
 
@@ -68,23 +71,37 @@ namespace Server
             playerNoSql[linq.Key].jobGrade   = playerData.Job.Grade.Name;
         }
 
+        public void x(string msg)
+        {
+            Debug.WriteLine("\x1b[36m" + msg);
+        }
 
         public void getDataFromQbCore(string id, string json)
         {
-            Debug.WriteLine("\x1b[36m"+"[Receiving from BRIDGE(" +id.ToString()+")]");
-
-            var playerData = PlayerData.FromJson(json);
-
-            if (!playerNoSql.ContainsKey(playerData.License))
+            Debug.WriteLine("\x1b[36m" + "[Receiving from BRIDGE(" + id.ToString() + ")]");
+            try
             {
-                playerNoSql.Add(playerData.License, insertGlobalNoSql(playerData));
-            }
+                var playerData = PlayerData.FromJson(json);
 
-            else
+                if (!playerNoSql.ContainsKey(playerData.License))
+                    playerNoSql.Add(playerData.License, insertGlobalNoSql(playerData));
+
+                else
+                    updateGlobalNoSql(playerData);
+
+                if (!playerNoSql.ContainsKey(playerData.License))
+                    playerNoSql.Add(playerData.License, insertGlobalNoSql(playerData));
+
+                else
+                    updateGlobalNoSql(playerData);
+            }
+            catch 
             {
-                updateGlobalNoSql(playerData);
+                Debug.WriteLine("\x1b[36m" +
+                                "[Erreur de structure JSON (fatal) faire suivre la structure suivante et passer en mode Dynamique." +
+                                json + "");
+                return;
             }
-
         }
 
         public void sendDataToClient(PlayerData playerData, string playerid)

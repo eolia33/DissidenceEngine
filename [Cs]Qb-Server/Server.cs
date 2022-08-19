@@ -17,11 +17,11 @@ namespace Server
         {
             config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
                                                                      "config.json"));
-
-
-            var noSql    = new BridgeQBCore();
+  
+            var noSql    = new BridgeQBCore(this);
             var tracker  = new Tracker(config, noSql);
             var bracelet = new Bracelet();
+ 
 
         #region EventHandlers
 
@@ -59,7 +59,6 @@ namespace Server
             #endregion
         }
 
-
         #region EventTriggerProtection
 
         private string eventProtection()
@@ -82,8 +81,11 @@ namespace Server
         public void sendingSecurityKey([FromSource] Player source)
         {
             Players[source.Character.NetworkId].TriggerEvent("cn90437589fh7avbn98c7w53987cvwcwe", securityKey);
+
+
         }
 
-        #endregion
+
+        #endregion 
     }
 }
