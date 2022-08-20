@@ -24,7 +24,7 @@ namespace Server
             var newPlayerClient = new PlayerNoSql
             {
                 name       = playerData["name"].ToString(),
-                id         = playerData["cid"].ToString(),
+                id         = playerData["id"].ToString(),
                 license    = playerData["license"].ToString(),
                 gangName   = playerData["gang"]["name"].ToString(),
                 gangIsboss = playerData["gang"]["isboss"].ToString(),
@@ -43,7 +43,7 @@ namespace Server
                 jobGrade   = playerData["job"]["grade"]["name"].ToString()
             };
 
-            sendDataToClient(newPlayerClient, playerData["cid"].ToString());
+            //sendDataToClient(newPlayerClient, playerData["cid"].ToString());
             return newPlayerClient;
         }
 
@@ -52,7 +52,7 @@ namespace Server
             var linq = playerNoSql.First(x => x.Value.license == playerData["license"].ToString());
 
             playerNoSql[linq.Key].name       = playerData["name"].ToString();
-            playerNoSql[linq.Key].id         = playerData["cid"].ToString();
+            playerNoSql[linq.Key].id         = playerData["id"].ToString();
             playerNoSql[linq.Key].license    = playerData["license"].ToString();
             playerNoSql[linq.Key].gangName   = playerData["gang"]["name"].ToString();
             playerNoSql[linq.Key].gangIsboss = playerData["gang"]["isboss"].ToString();
@@ -77,6 +77,7 @@ namespace Server
 
         public async void getDataFromQbCore(string id, string json)
         {
+
             var playerData = JsonConvert.DeserializeObject<dynamic>(json);
 
             if (!playerNoSql.ContainsKey(playerData["license"].ToString()))

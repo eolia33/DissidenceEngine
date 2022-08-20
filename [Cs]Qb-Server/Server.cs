@@ -23,10 +23,12 @@ namespace Server
             var tracker  = new Tracker(config, noSql);
             var bracelet = new Bracelet();
             var fireShot = new FireShot(noSql);
- 
 
-        #region EventHandlers
 
+            #region EventHandlers
+
+            EventHandlers["cs:server:shootingzone:new:policealert"] +=
+            new Action<string>(fireShot.getActiveCops);
 
             EventHandlers["cs:engine:server:playerdata:update"] += 
                 new Action<string,string>( noSql.getDataFromQbCore);

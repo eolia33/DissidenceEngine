@@ -15,7 +15,7 @@ namespace Configuration
         public int                         zoneWaitTime                        { get; set; }
         public string                      zoneDefaultName                     { get; set; }
         
-        public string []       msg_zoneNotification         { get; set; }
+        
         public bool         zoneDefaultDisPlayStreetName { get; set; }
         public List<string> zoneDefaultJobToTriggerNorth { get; set; }
         public List<string> zoneDefaultJobToTriggerSouth { get; set; }
@@ -29,7 +29,9 @@ namespace Configuration
         public Circle       zoneDefaultCircleError       { get; set; }
         public List<string> zoneDefaultJobToSwtichSouth  { get; set; }
         public List<string> zoneDefaultJobToSwtichNorth  { get; set; }
-        
+        public int          zoneSprite                   { get; set; }
+        public int          zoneSpriteColor              { get; set; }
+
         public bool                        cerbere                             { get; set; }
         public string[]                    msg_selfUserLeaveTracker            { get; set; } = new string[3];
         public string[]                    msg_selfUserLeaveTrackerDuty        { get; set; } = new string[3];
@@ -43,6 +45,7 @@ namespace Configuration
         public string[]                    msg_selfUserNameFrequencyRestricted { get; set; } = new string[3];
         public string[]                    msg_selfTrackerNotificationOn       { get; set; } = new string[3];
         public string[]                    msg_selfTrackerNotificationOff      { get; set; } = new string[3];
+        public string[]                    msg_zoneNotification                { get; set; } = new string[3];
         public int                         trackerServerPollingRate            { get; set; }
         public int                         trackerBlipSprite                   { get; set; }
         public List<RestrictedFrequencies> restrictedFrequencies               { get; set; }

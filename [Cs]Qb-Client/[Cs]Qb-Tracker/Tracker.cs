@@ -130,7 +130,7 @@ namespace Client
                     BeginTextCommandSetBlipName("STRING");
                     AddTextComponentString("." + v.Value.PedName);
                     EndTextCommandSetBlipName(blip); 
-                    _ = Task.Run(() => { removeBlip(blip, pollingRate); });
+                    removeBlip(blip, pollingRate);
 
                 }
             }
@@ -143,14 +143,11 @@ namespace Client
             SetBlipColour(blip, 3);
         }
 
-        private Task removeBlip(int blip, int time)
+        private async Task removeBlip(int blip, int time)
         {
-            Thread.Sleep(time);
+            await Delay(time);
             RemoveBlip(ref blip);
-
-            return Task.CompletedTask;
         }
-
 
         public class GpsNetworkClient
         {

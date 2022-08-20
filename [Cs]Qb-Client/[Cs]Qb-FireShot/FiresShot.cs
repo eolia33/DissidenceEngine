@@ -125,7 +125,7 @@ namespace Client
                 x                 = Convert.ToInt32(vector.X),
                 y                 = Convert.ToInt32(vector.Y)
             };
-            TriggerServerEvent("cs:server:shootingzone:new:policealert", policeAlertContent);
+            TriggerServerEvent("cs:server:shootingzone:new:policealert", JsonConvert.SerializeObject(policeAlertContent));
         }
 
         private int randomGenerator(int x, int y, int type)
@@ -134,9 +134,9 @@ namespace Client
             {
                 case 1:
 
-                    var rand = random.Next(0, 10000);
+                    var rand = random.Next(0, 100);
 
-                    if (rand > 10000 - x * 100)
+                    if (rand > (100 - x))
                         return 1;
 
                     return 0;
@@ -163,31 +163,31 @@ namespace Client
             return c;
         }
         
+
         public void fireShotServerResponse(int circleDuration,int circlesize, int x, int y, bool displayStreetName, string streetName )
         {
-            var blip = AddBlipForCoord(x, y,0);
-            SetBlipSprite(blip, 161);
-            SetBlipColour(blip, 41);
-            SetBlipScale(blip, circlesize);
-            SetBlipAsShortRange(blip, true);
-            _ = Task.Run(() => { removeBlip(blip, circleDuration); });
-            
-            if(displayStreetName)
-                 nuiNotify(config.msg_zoneNotification, "Location :" + streetName);
-            else              
-                nuiNotify(config.msg_zoneNotification, "");
-        }  
-        private Task removeBlip(int blip, int time)
-        {
-            Thread.Sleep(time);
-            RemoveBlip(ref blip);
+            makeBlip(circleDuration, circlesize, x, y);
 
-            return Task.CompletedTask;
+            if(displayStreetName)
+                nui(config.msg_zoneNotification, "Au niveau de : " + streetName);
+            else 
+                nui(config.msg_zoneNotification, "");
+        }  
+
+        private async Task makeBlip(int circleDuration, int circlesize, int x, int y)
+        {
+            var blip = AddBlipForCoord(x, y, 0);
+            SetBlipSprite(blip, config.zoneSprite);
+            SetBlipScale(blip, (circlesize / 100));
+            SetBlipColour(blip, config.zoneSpriteColor);
+            SetBlipAsShortRange(blip, true);
+            await Delay(circleDuration);
+            RemoveBlip(ref blip);            
         }
 
-        public async void nuiNotify(string[] msg, string replace = null)
+        public void nui(string[] msg, string replace = null)
         {
-            TriggerEvent(config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
+            TriggerEvent(config.notificationEngine, msg[0], msg[1].Replace("{replace}",replace), msg[2], msg[3]);
         }
     }
 }

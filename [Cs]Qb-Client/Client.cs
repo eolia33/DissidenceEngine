@@ -12,39 +12,35 @@ namespace Client
     public class Client : BaseScript
     {
         private Player       player;
-        public  int          lastBlip     { get; set; }
-        public  NuiState     nuiState     { get; set; }
+        public  int          LastLip     { get; set; }
+        public  NuiState     NuiState     { get; set; }
         public  string       template     { get; set; }
         public  Point[]      points       { get; set; }
         public  bool         isDisplaying { get; set; }
         public  bool         isMouse      { get; set; }
         public  Tracker      tracker      { get; set; }
-        public  SharedConfig config       { get; }
-        public  FireShot     fireShot     { get; set; }
+        public  SharedConfig Config       { get; }
+        public  FireShot     FireShot     { get; set; }
 
 
         public Client()
         {
-            var _config       = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(), "config.json"));
-            config            = _config;
-            var bridge        = new Bridge(config);
-            var _nuiState     = new NuiState();
-            var tracker       = new Tracker(config, bridge, Game.Player, _nuiState);
-            var _fireShot = new FireShot(config);
-            var _lastBlip     = 0;
-            nuiState          = _nuiState;
-            config            = _config;
-            lastBlip          = _lastBlip;
-            fireShot      = _fireShot;
+            var config        = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(), "Config.json"));
+            Config            = config;
+            var bridge        = new Bridge(Config);
+            var nuiState      = new NuiState();
+            NuiState          = nuiState;
+            var tracker       = new Tracker(Config, bridge, Game.Player, NuiState);
+            var fireShot      = new FireShot(Config);
+            var lastBlip      = 0;
+            LastLip           = lastBlip;
+            FireShot          = fireShot;
 
             EventHandlers["onClientResourceStart"]                    +=
                 new Action<string>(OnClientResourceStart);
 
             EventHandlers["securityBraceletRespFromServ"]             +=
                 new Action<string, string, Vector3>(securityBraceletRespFromServ);
-
-            EventHandlers["cn90437589fh7avbn98c7w53987cvwcwe"]        +=
-                new Action<string>(loadFromJsonTemplate);
 
             EventHandlers["cs:engine:client:tracker:open"]            +=
                 new Action(tracker.trackerOpen);
@@ -81,7 +77,6 @@ namespace Client
             EventHandlers["__cfx_nui:cs:engine:client:tracker:coloronline"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
                 {
-                    Debug.WriteLine("color chanbge");
                     TriggerServerEvent("cs:engine:server:tracker:color:change", data["x"]);
                 });
 
@@ -94,6 +89,9 @@ namespace Client
                         data["x"]);
                 });
 
+            EventHandlers["cs:engine:client:fireshot:alert"] +=
+                new Action<int,int,int,int,bool,string>(fireShot.fireShotServerResponse);
+
             Tick += OnTick;
         }
 
@@ -101,10 +99,10 @@ namespace Client
         private async Task OnTick()
         {
             player = Game.Player;
-            SetNuiFocus(nuiState.visible, nuiState.mouse);
+            SetNuiFocus(NuiState.visible, NuiState.mouse);
 
             if (IsPedShooting(PlayerPedId()))
-                await fireShot.checkZone(PlayerPedId());
+                await FireShot.checkZone(PlayerPedId());
         }
 
 
