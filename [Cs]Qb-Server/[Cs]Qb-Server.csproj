@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Desktop\txData\server\resources\[cs]\engine\</OutputPath>
+    <OutputPath>..\..\..\..\Desktop\txData\dissidence\resources\[cs]\engine\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,7 +39,9 @@
   <ItemGroup>
     <Reference Include="CitizenFX.Core.Server, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CitizenFX.Core.Server.1.0.5818\lib\net45\CitizenFX.Core.Server.dll</HintPath>
+      <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -61,8 +63,8 @@
     <Compile Include="[Cs]Qb-Bracelet\Bracelet.cs" />
     <Compile Include="[Cs]Qb-Bridge\Bridge.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="[Cs]Qb-FireShot\FireShot.cs" />
     <Compile Include="[Cs]Qb-Tracker\Tracker.cs" />
-    <Compile Include="[Cs]Qb-Json\Json.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

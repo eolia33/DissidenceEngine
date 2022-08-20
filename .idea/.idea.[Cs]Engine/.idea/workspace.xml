@@ -8,20 +8,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ade33172-a4c1-49e0-bdff-0470b952a16c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-FireShot/FireShot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/Math.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/packages.config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Tracker/Tracker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Tracker/Tracker.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/packages.config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Shared/Json.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Tracker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Tracker.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/packages.config" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/packages.config" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,23 +26,42 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectId" id="2DR4Z02YiozHqCTwLPQckNsxuTX" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "WebServerToolWindowFactoryState": "false",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RiderProblemsViewState">
+    <hideBySeverity>
+      <option value="11" />
+      <option value="15" />
+      <option value="20" />
+      <option value="300" />
+    </hideBySeverity>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -61,8 +77,19 @@
       <workItem from="1660843727351" duration="532000" />
       <workItem from="1660942636890" duration="1324000" />
       <workItem from="1660945581130" duration="231000" />
-      <workItem from="1660946046987" duration="20000" />
+      <workItem from="1660946046987" duration="3297000" />
+      <workItem from="1660994296678" duration="95000" />
+      <workItem from="1660998200803" duration="41000" />
+      <workItem from="1661002539310" duration="3984000" />
     </task>
+    <task id="LOCAL-00001" summary="Fonctionnel !">
+      <created>1660946412384</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1660946412384</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -81,5 +108,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Fonctionnel !" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fonctionnel !" />
   </component>
 </project>

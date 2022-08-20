@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using Configuration;
 using Newtonsoft.Json;
-using QbBridge;
 using static CitizenFX.Core.Native.API;
 
 namespace Server
@@ -35,7 +34,7 @@ namespace Server
             frequencyList = _frequencyList;
             gpsListing    = _gpsListing;
 
-            _ = Task.Run(() => { gpsListeningClients(gpsListing, frequencyList); });
+            Task.Run(() => { gpsListeningClients(gpsListing, frequencyList); });
         }
 
         #region Connecting to Tracker

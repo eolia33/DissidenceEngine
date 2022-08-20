@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using CitizenFX.Core;
 using Configuration;
 using Newtonsoft.Json;
@@ -21,13 +22,14 @@ namespace Server
             var noSql    = new BridgeQBCore(this);
             var tracker  = new Tracker(config, noSql);
             var bracelet = new Bracelet();
+            var fireShot = new FireShot(noSql);
  
 
         #region EventHandlers
 
 
-            EventHandlers["cs:engine:server:playerdata:update"] +=
-                new Action<string, string>(noSql.getDataFromQbCore);
+            EventHandlers["cs:engine:server:playerdata:update"] += 
+                new Action<string,string>( noSql.getDataFromQbCore);
 
             EventHandlers["cs:engine:server:duty:tracker"] +=
                 new Action<string,string>(tracker.dutySwitcher);

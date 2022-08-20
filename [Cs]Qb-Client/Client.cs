@@ -11,17 +11,16 @@ namespace Client
 {
     public class Client : BaseScript
     {
-        private Player player;
-        public int lastBlip { get; set; }
-        public NuiState nuiState { get; set; }
-        public string template { get; set; }
-        public Point[] points { get; set; }
-        public bool isDisplaying { get; set; }
-        public bool isMouse { get; set; }
-        public Tracker tracker { get; set; }
-        public SharedConfig config { get; }
-
-        public ShootingZone shootingZone { get; set; }
+        private Player       player;
+        public  int          lastBlip     { get; set; }
+        public  NuiState     nuiState     { get; set; }
+        public  string       template     { get; set; }
+        public  Point[]      points       { get; set; }
+        public  bool         isDisplaying { get; set; }
+        public  bool         isMouse      { get; set; }
+        public  Tracker      tracker      { get; set; }
+        public  SharedConfig config       { get; }
+        public  FireShot     fireShot     { get; set; }
 
 
         public Client()
@@ -31,12 +30,12 @@ namespace Client
             var bridge        = new Bridge(config);
             var _nuiState     = new NuiState();
             var tracker       = new Tracker(config, bridge, Game.Player, _nuiState);
-            var _shootingZone = new ShootingZone(config);
+            var _fireShot = new FireShot(config);
             var _lastBlip     = 0;
             nuiState          = _nuiState;
             config            = _config;
             lastBlip          = _lastBlip;
-            shootingZone      = _shootingZone;
+            fireShot      = _fireShot;
 
             EventHandlers["onClientResourceStart"]                    +=
                 new Action<string>(OnClientResourceStart);
@@ -75,7 +74,7 @@ namespace Client
             EventHandlers["__cfx_nui:cs:engine:client:tracker:color"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
                 {
-                    tracker.trackerSetColor(data);
+                    tracker.TrackerSetColor(data);
                 });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:coloronline");
@@ -105,7 +104,7 @@ namespace Client
             SetNuiFocus(nuiState.visible, nuiState.mouse);
 
             if (IsPedShooting(PlayerPedId()))
-                shootingZone.checkZone(PlayerPedId());
+                await fireShot.checkZone(PlayerPedId());
         }
 
 
@@ -134,7 +133,6 @@ namespace Client
             {
                 TriggerServerEvent("QBCore:ToggleDuty", GetPlayerServerId(player.Handle));
             }), false);
-
 
         }
         

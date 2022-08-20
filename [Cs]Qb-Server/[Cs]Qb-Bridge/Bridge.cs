@@ -1,10 +1,8 @@
-﻿using QbBridge;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CitizenFX.Core;
 using Newtonsoft.Json;
 using Configuration;
-using System;
 
 
 namespace Server
@@ -12,7 +10,7 @@ namespace Server
     public class BridgeQBCore : BaseScript
     {
         public Dictionary<string, PlayerNoSql> playerNoSql { get; set; }
-        public Server                          server      { get; set; }
+        public Server server { get; set; }
 
         public BridgeQBCore(Server _server)
         {
@@ -21,54 +19,55 @@ namespace Server
             server      = _server;
         }
 
-        private PlayerNoSql insertGlobalNoSql(PlayerData playerData)
+        private PlayerNoSql insertGlobalNoSql(dynamic playerData)
         {
             var newPlayerClient = new PlayerNoSql
             {
-                name       = playerData.Name,
-                id         = playerData.Cid.ToString(),
-                license    = playerData.License,
-                gangName   = playerData.Gang.Name,
-                gangIsboss = playerData.Gang.Isboss.ToString(),
-                gangLabel  = playerData.Gang.Label,
-                gangGrade  = playerData.Gang.Grade.Name,
-                citizenid  = playerData.Citizenid,
-                birthdate  = playerData.Charinfo.Birthdate.ToString(),
-                phone      = playerData.Charinfo.Phone.ToString(),
-                cid        = playerData.Cid.ToString(),
-                firstname  = playerData.Charinfo.Firstname,
-                lastname   = playerData.Charinfo.Lastname,
-                gender     = playerData.Charinfo.Gender.ToString(),
-                account    = playerData.Charinfo.Account,
-                jobOnDuty  = playerData.Job.Onduty.ToString(),
-                jobName    = playerData.Job.Name,
-                jobGrade   = playerData.Job.Grade.Name
+                name       = playerData["name"].ToString(),
+                id         = playerData["cid"].ToString(),
+                license    = playerData["license"].ToString(),
+                gangName   = playerData["gang"]["name"].ToString(),
+                gangIsboss = playerData["gang"]["isboss"].ToString(),
+                gangLabel  = playerData["gang"]["label"].ToString(),
+                gangGrade  = playerData["gang"]["grade"]["name"].ToString(),
+                citizenid  = playerData["citizenid"].ToString(),
+                birthdate  = playerData["charinfo"]["birthdate"].ToString(),
+                phone      = playerData["charinfo"]["phone"].ToString(),
+                cid        = playerData["cid"].ToString(),
+                firstname  = playerData["charinfo"]["firstname"].ToString(),
+                lastname   = playerData["charinfo"]["lastname"].ToString(),
+                gender     = playerData["charinfo"]["gender"].ToString(),
+                account    = playerData["charinfo"]["account"].ToString(),
+                jobOnDuty  = playerData["job"]["onduty"].ToString(),
+                jobName    = playerData["job"]["name"].ToString(),
+                jobGrade   = playerData["job"]["grade"]["name"].ToString()
             };
+
+            sendDataToClient(newPlayerClient, playerData["cid"].ToString());
             return newPlayerClient;
         }
 
-        private void updateGlobalNoSql(PlayerData playerData)
+        private void updateGlobalNoSql(dynamic playerData)
         {
-            var linq = playerNoSql.Where(x => x.Value.license == playerData.License).First();
+            var linq = playerNoSql.First(x => x.Value.license == playerData["license"].ToString());
 
-            playerNoSql[linq.Key].name       = playerData.Name;
-            playerNoSql[linq.Key].id         = playerData.Cid.ToString();
-            playerNoSql[linq.Key].license    = playerData.License;
-            playerNoSql[linq.Key].gangName   = playerData.Gang.Name;
-            playerNoSql[linq.Key].gangIsboss = playerData.Gang.Isboss.ToString();
-            playerNoSql[linq.Key].gangLabel  = playerData.Gang.Label;
-            playerNoSql[linq.Key].gangGrade  = playerData.Gang.Grade.Name;
-            playerNoSql[linq.Key].citizenid  = playerData.Citizenid;
-            playerNoSql[linq.Key].birthdate  = playerData.Charinfo.Birthdate.ToString();
-            playerNoSql[linq.Key].phone      = playerData.Charinfo.Phone.ToString();
-            playerNoSql[linq.Key].cid        = playerData.Cid.ToString();
-            playerNoSql[linq.Key].firstname  = playerData.Charinfo.Firstname;
-            playerNoSql[linq.Key].lastname   = playerData.Charinfo.Lastname;
-            playerNoSql[linq.Key].gender     = playerData.Charinfo.Gender.ToString();
-            playerNoSql[linq.Key].account    = playerData.Charinfo.Account;
-            playerNoSql[linq.Key].jobOnDuty  = playerData.Job.Onduty.ToString();
-            playerNoSql[linq.Key].jobName    = playerData.Job.Name;
-            playerNoSql[linq.Key].jobGrade   = playerData.Job.Grade.Name;
+            playerNoSql[linq.Key].name       = playerData["name"].ToString();
+            playerNoSql[linq.Key].id         = playerData["cid"].ToString();
+            playerNoSql[linq.Key].license    = playerData["license"].ToString();
+            playerNoSql[linq.Key].gangName   = playerData["gang"]["name"].ToString();
+            playerNoSql[linq.Key].gangIsboss = playerData["gang"]["isboss"].ToString();
+            playerNoSql[linq.Key].gangLabel  = playerData["gang"]["label"].ToString();
+            playerNoSql[linq.Key].gangGrade  = playerData["gang"]["name"].ToString();
+            playerNoSql[linq.Key].citizenid  = playerData["citizenid"].ToString();
+            playerNoSql[linq.Key].birthdate  = playerData["charinfo"]["birthdate"].ToString();
+            playerNoSql[linq.Key].phone      = playerData["charinfo"]["phone"].ToString();
+            playerNoSql[linq.Key].cid        = playerData["charinfo"]["firstname"].ToString();
+            playerNoSql[linq.Key].lastname   = playerData["charinfo"]["lastname"].ToString();
+            playerNoSql[linq.Key].gender     = playerData["charinfo"]["gender"].ToString();
+            playerNoSql[linq.Key].account    = playerData["charinfo"]["account"].ToString();
+            playerNoSql[linq.Key].jobOnDuty  = playerData["job"]["onduty"].ToString();
+            playerNoSql[linq.Key].jobName    = playerData["job"]["name"].ToString();
+            playerNoSql[linq.Key].jobGrade   = playerData["job"]["grade"]["name"].ToString();
         }
 
         public void x(string msg)
@@ -76,56 +75,27 @@ namespace Server
             Debug.WriteLine("\x1b[36m" + msg);
         }
 
-        public void getDataFromQbCore(string id, string json)
+        public async void getDataFromQbCore(string id, string json)
         {
-            Debug.WriteLine("\x1b[36m" + "[Receiving from BRIDGE(" + id.ToString() + ")]");
-            try
-            {
-                var playerData = PlayerData.FromJson(json);
+            var playerData = JsonConvert.DeserializeObject<dynamic>(json);
 
-                if (!playerNoSql.ContainsKey(playerData.License))
-                    playerNoSql.Add(playerData.License, insertGlobalNoSql(playerData));
+            if (!playerNoSql.ContainsKey(playerData["license"].ToString()))
+                playerNoSql.Add(playerData["license"].ToString(), insertGlobalNoSql(playerData));
 
-                else
-                    updateGlobalNoSql(playerData);
+            else
+                updateGlobalNoSql(playerData);
 
-                if (!playerNoSql.ContainsKey(playerData.License))
-                    playerNoSql.Add(playerData.License, insertGlobalNoSql(playerData));
+            if (!playerNoSql.ContainsKey(playerData["license"].ToString()))
+                playerNoSql.Add(playerData["license"].ToString(), insertGlobalNoSql(playerData));
 
-                else
-                    updateGlobalNoSql(playerData);
-            }
-            catch 
-            {
-                Debug.WriteLine("\x1b[36m" +
-                                "[Erreur de structure JSON (fatal) faire suivre la structure suivante et passer en mode Dynamique." +
-                                json + "");
-                return;
-            }
+            else
+                updateGlobalNoSql(playerData);
         }
 
-        public void sendDataToClient(PlayerData playerData, string playerid)
+        public void sendDataToClient(PlayerNoSql playerData, string playerid)
         {
-            var listToJson = new List<PlayerNoSql>();
-
-            listToJson.Add(new PlayerNoSql()
-            {
-                id         = playerData.Cid.ToString(),
-                gangName   = playerData.Gang.Name,
-                gangIsboss = playerData.Gang.Isboss.ToString(),
-                gangLabel  = playerData.Gang.Label,
-                citizenid  = playerData.Citizenid.ToString(),
-                phone      = playerData.Charinfo.Phone.ToString(),
-                cid        = playerData.Cid.ToString(),
-                firstname  = playerData.Charinfo.Firstname,
-                lastname   = playerData.Charinfo.Lastname,
-                gender     = playerData.Charinfo.Gender.ToString(),
-                jobOnDuty  = playerData.Job.Onduty.ToString(),
-                jobName    = playerData.Job.Name,
-                jobGrade   = playerData.Job.Grade.Name
-            });
-
-            Players[playerid].TriggerEvent("c#ServerUpdate", JsonConvert.SerializeObject(listToJson));
+            Players[playerid]
+                .TriggerEvent("cs:engine:client:playerdata:update", JsonConvert.SerializeObject(playerData));
         }
     }
 }

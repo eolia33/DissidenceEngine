@@ -6,6 +6,7 @@ using CitizenFX.Core.Native;
 using static CitizenFX.Core.Native.API;
 using Newtonsoft.Json;
 using System.Drawing;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using Configuration;
 using Client;
@@ -29,7 +30,7 @@ namespace Client
             color    = "1";
         }
 
-        public void trackerOpen()
+        public async void trackerOpen()
         {
             string jsonString = "{\"type\":\"Open\",\"enable\":true}";
             nuiState.visible = true;
@@ -37,7 +38,7 @@ namespace Client
             SendNuiMessage(jsonString);
         }
 
-        public void trackerClose()
+        public async void trackerClose()
         {
             string jsonString = "{\"type\":\"Close\",\"enable\":true}";
             nuiState.visible = false;
@@ -45,7 +46,7 @@ namespace Client
             SendNuiMessage(jsonString);
         }
 
-        public void trackerLeave(int type)
+        public async void trackerLeave(int type)
         {
             Debug.WriteLine("client off command type " + type);
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
@@ -66,7 +67,7 @@ namespace Client
         }
 
 
-        public void trackerOff()
+        public async void trackerOff()
         {
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
             nuiState.visible = true;
@@ -74,7 +75,7 @@ namespace Client
             SendNuiMessage(jsonString);
         }
 
-        public void trackerOk()
+        public async void trackerOk()
         {
             string jsonString = "{\"type\":\"On\",\"enable\":true}";
             nuiState.visible = true;
@@ -82,13 +83,13 @@ namespace Client
             SendNuiMessage(jsonString);
         }
 
-        public void trackerSetColor(IDictionary<string, object> json)
+        public async void TrackerSetColor(IDictionary<string, object> json)
         {
             var math = Convert.ToInt32(json["x"]) + 1;
             color = math.ToString();
         }
 
-        public void trackerJoin(IDictionary<string, object> json)
+        public async void trackerJoin(IDictionary<string, object> json)
         {
             if (string.IsNullOrEmpty(json["channel"].ToString()))
             {
@@ -111,7 +112,7 @@ namespace Client
                                color);
         }
 
-        public void trackerServerPing(string json, int pollingRate, int blipSprite)
+        public async void trackerServerPing(string json, int pollingRate, int blipSprite)
         {
             Dictionary<string, GpsNetworkClient> gps =
                 JsonConvert.DeserializeObject<Dictionary<string, GpsNetworkClient>>(json);
@@ -128,23 +129,26 @@ namespace Client
                     SetBlipAsShortRange(blip, true);
                     BeginTextCommandSetBlipName("STRING");
                     AddTextComponentString("." + v.Value.PedName);
-                    EndTextCommandSetBlipName(blip);
-                    removeBlip(blip, pollingRate);
+                    EndTextCommandSetBlipName(blip); 
+                    _ = Task.Run(() => { removeBlip(blip, pollingRate); });
+
                 }
             }
         }
 
-        public void MakeBlip(Vector3 location)
+        public async void MakeBlip(Vector3 location)
         {
             var blip = AddBlipForCoord(location[0], location[1], location[2]);
             SetBlipSprite(blip, 1);
             SetBlipColour(blip, 3);
         }
 
-        public async void removeBlip(int blip, int time)
+        private Task removeBlip(int blip, int time)
         {
-            await Delay(time);
+            Thread.Sleep(time);
             RemoveBlip(ref blip);
+
+            return Task.CompletedTask;
         }
 
 
@@ -157,7 +161,7 @@ namespace Client
             public Vector3 PedCoordinats;
         }
 
-        public void nuiNotify(string[] msg, string replace = null)
+        public async void nuiNotify(string[] msg, string replace = null)
         {
             TriggerEvent(config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
         }

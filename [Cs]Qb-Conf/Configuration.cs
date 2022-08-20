@@ -14,19 +14,22 @@ namespace Configuration
     {
         public int                         zoneWaitTime                        { get; set; }
         public string                      zoneDefaultName                     { get; set; }
-        public bool                        zoneDefaultDisPlayStreetName        { get; set; }
-        public List<string>                zoneDefaultJobToTriggerNorth        { get; set; }
-        public List<string>                zoneDefaultJobToTriggerSouth        { get; set; }
-        public bool                        zoneDefaultSwitchJob                { get; set; }
-        public List<string>                zoneDefaultJobToSwtich              { get; set; }
-        public string                      notificationEngine                  { get; set; }
-        public int                         zoneDefaultDay                      { get; set; }
-        public int                         zoneDefaultNight                    { get; set; }
-        public Circle                      zoneDefaultCircleSize               { get; set; }
-        public int                         zoneDefaultCircleDuration           { get; set; }
-        public Circle                      zoneDefaultCircleError              { get; set; }
-        public List<string>                zoneDefaultJobToSwtichSouth         { get; set; }
-        public List<string>                zoneDefaultJobToSwtichNorth         { get; set; }
+        
+        public string []       msg_zoneNotification         { get; set; }
+        public bool         zoneDefaultDisPlayStreetName { get; set; }
+        public List<string> zoneDefaultJobToTriggerNorth { get; set; }
+        public List<string> zoneDefaultJobToTriggerSouth { get; set; }
+        public bool         zoneDefaultSwitchJob         { get; set; }
+        public List<string> zoneDefaultJobToSwtich       { get; set; }
+        public string       notificationEngine           { get; set; }
+        public int          zoneDefaultDay               { get; set; }
+        public int          zoneDefaultNight             { get; set; }
+        public Circle       zoneDefaultCircleSize        { get; set; }
+        public int          zoneDefaultCircleDuration    { get; set; }
+        public Circle       zoneDefaultCircleError       { get; set; }
+        public List<string> zoneDefaultJobToSwtichSouth  { get; set; }
+        public List<string> zoneDefaultJobToSwtichNorth  { get; set; }
+        
         public bool                        cerbere                             { get; set; }
         public string[]                    msg_selfUserLeaveTracker            { get; set; } = new string[3];
         public string[]                    msg_selfUserLeaveTrackerDuty        { get; set; } = new string[3];
@@ -83,6 +86,8 @@ namespace Configuration
         public List<string> jobtotriger       { get; set; }
         public List<string> jobToSwitch       { get; set; }
         public bool         defaultSwitchJob  { get; set; }
+        public int          x                 { get; set; }
+        public int          y                 { get; set; }
     }
 
     public class Alert
