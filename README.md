@@ -27,6 +27,7 @@ end)
 - Shot Fire
   - Zones configurées dans le fichier zone.json.
   - Probabilité par zone, taille de cercle par zone, par période du jour. 
+  - Découpage de la carte a 1300 entre le nord et le sud
   - Marge d'erreur réglée par zone dans la position du cercle de tir. 
   - Previent police ou sherif en fonction de la zone, et l'autre entité si personne en service.
   
