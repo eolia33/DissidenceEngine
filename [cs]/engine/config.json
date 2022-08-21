@@ -1,0 +1,55 @@
+{
+
+ "notificationEngine":"okokNotify:Alert",
+ "trackerServerPollingRate" : 800,
+ "trackerBlipSprite" : 185,
+
+ "msg_zoneNotification" : ["Police - Alert","Un citoyen vient de signaler des échanges de tirs. {replace}","3000","warning"],
+ "msg_selfUserJoinTracker" : ["WorldCom - Tracker","Vous êtes connecté sur la fréquence balise #{replace}","3000","success"],
+ "msg_selfUserLeaveTracker" : ["WorldCom - Tracker","Vous venez de quitter la réseau balise","3000","error"],
+ "msg_selfUserLeaveTrackerDuty" : ["WorldCom - Tracker","Vous venez de quitter la réseau balise (fin de service)","3000","error"],
+
+ "msg_otherUserLeaveTracker" : ["WorldCom - Tracker","L'utilisateur {replace} vient de se déconnecté du réseau balise","3000","info"],
+ "msg_otherUserLeaveTrackerByForce" : ["WorldCom - Tracker","L'utilisateur {replace} vient de se faire retirer sa balise","3000","warning"],
+ "msg_otherUserLeaveTrackerByDuty" : ["WorldCom - Tracker","L'utilisateur {replace} n'est plus en service","3000","info"],
+
+ "msg_selfUserErrorFrequency" : ["WorldCom - Tracker","Aucune fréquence balise spécifiée","3000","error"],
+ "msg_selfUserNameFrequency" : ["WorldCom - Tracker","Aucun nom d'utilisateur spécifié","3000","error"],
+ "msg_selfUserNameFrequencyRestricted" : ["WorldCom - Tracker","Cette fréquence est réservée","3000","error"],
+
+ "msg_selfTrackerNotificationOff" : ["WorldCom - Tracker","Notifications de balise désactivées","3000","info"],
+ "msg_selfTrackerNotificationOn" : ["WorldCom - Tracker","Notifications de balise activées","3000","info"],
+ "msg_otherUserJoinTracker" : ["WorldCom - Tracker","L'utilisateur {replace} est connecté sur votre fréquence balise","3000","info"],
+
+
+ "RestrictedFrequencies": [
+  {
+   "frequency": 1, 
+   "onduty": false,
+   "jobs": ["police","ems"]
+  },
+  {
+   "frequency": 2,
+   "onduty": false,
+   "jobs": ["police","ems","charo"]
+  }
+ ],
+
+ "zoneDefaultName" : "Defaut Zoning",
+ "zoneDefaultDisPlayStreetName" : false,
+ "zoneDefaultJobToTriggerNorth" : ["sherif"],
+ "zoneDefaultJobToTriggerSouth" : ["police"],
+ "zoneDefaultSwitchJob" : true,
+ "zoneDefaultJobToSwtichNorth"  : ["police"],
+ "zoneDefaultJobToSwtichSouth"  : ["sherif"],
+ "zoneDefaultDay" : 10,
+ "zoneDefaultNight": 5,
+ "zoneDefaultCircleSize"  : {"min": 130,"max": 400},
+ "zoneDefaultCircleError" : {"min": 30,"max": 80},
+ "zoneDefaultCircleDuration" : 5000,
+ "zoneWaitTime" : 10000,
+ "zoneSprite" : 161,
+ "zoneSpriteColor":75
+}
+
+
