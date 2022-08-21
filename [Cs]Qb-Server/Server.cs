@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using CitizenFX.Core;
 using Configuration;
 using Newtonsoft.Json;
@@ -11,19 +9,15 @@ namespace Server
 {
     public class Server : BaseScript
     {
-        public SharedConfig config { get; }
-        public string securityKey { get; set; }
-
+        public SharedConfig Config { get; }
         public Server()
         {
-            config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
+            Config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
                                                                      "config.json"));
-  
-            var noSql    = new BridgeQBCore(this);
-            var tracker  = new Tracker(config, noSql);
-            var bracelet = new Bracelet();
-            var fireShot = new FireShot(noSql);
-
+            var playerData = new BridgeQbCore(this);
+            var tracker    = new Tracker(Config, playerData);
+            var bracelet   = new Bracelet();
+            var fireShot   = new FireShot(playerData);
 
             #region EventHandlers
 
@@ -31,7 +25,7 @@ namespace Server
             new Action<string>(fireShot.getActiveCops);
 
             EventHandlers["cs:engine:server:playerdata:update"] += 
-                new Action<string,string>( noSql.getDataFromQbCore);
+                new Action<string,string>( playerData.getDataFromQbCore);
 
             EventHandlers["cs:engine:server:duty:tracker"] +=
                 new Action<string,string>(tracker.dutySwitcher);
@@ -56,40 +50,8 @@ namespace Server
 
             EventHandlers["playerDropped"] +=
                 new Action<Player,string>(tracker.userLeavingDrop);
-
-            EventHandlers["M9Pef449Slk40GDbdsrt304t4506gkKDR3230GDXsdfkjhsfd"] +=
-                new Action<Player>(sendingSecurityKey);
-
+            
             #endregion
         }
-
-        #region EventTriggerProtection
-
-        private string eventProtection()
-        {
-            var keyBase = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var keySize = new char[50];
-            var random  = new Random();
-
-            for (var i = 0; i < keySize.Length; i++) keySize[i] = keyBase[random.Next(keyBase.Length)];
-
-            var securityKey = new string(keySize);
-            return securityKey;
-        }
-
-        public void kick([FromSource] Player source)
-        {
-            DropPlayer(source.Handle, "A Bientôt !");
-        }
-
-        public void sendingSecurityKey([FromSource] Player source)
-        {
-            Players[source.Character.NetworkId].TriggerEvent("cn90437589fh7avbn98c7w53987cvwcwe", securityKey);
-
-
-        }
-
-
-        #endregion 
     }
 }

@@ -2,47 +2,43 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using static CitizenFX.Core.Native.API;
 using Newtonsoft.Json;
-using System.Drawing;
-using System.Threading;
-using Newtonsoft.Json.Linq;
 using Configuration;
-using Client;
+
 
 
 namespace Client
 {
     public class Tracker : BaseScript
     {
-        public SharedConfig config { get; set; }
-        public Player player { get; set; }
-        public string color { get; set; }
-        public NuiState nuiState { get; set; }
+        public SharedConfig Config { get; set; }
+        public Player Player { get; set; }
+        public string Color { get; set; }
+        public NuiState NuiState { get; set; }
 
 
-        public Tracker(SharedConfig _configuration, Bridge _bridge, Player _player, NuiState _nuiState)
+        public Tracker(SharedConfig configuration, Bridge bridge, Player player, NuiState nuiState)
         {
-            config   = _configuration;
-            player   = _player;
-            nuiState = _nuiState;
-            color    = "1";
+            Config   = configuration;
+            Player   = player;
+            NuiState = nuiState;
+            Color    = "1";
         }
 
         public async void trackerOpen()
         {
             string jsonString = "{\"type\":\"Open\",\"enable\":true}";
-            nuiState.visible = true;
-            nuiState.mouse   = true;
+            NuiState.visible = true;
+            NuiState.mouse   = true;
             SendNuiMessage(jsonString);
         }
 
         public async void trackerClose()
         {
             string jsonString = "{\"type\":\"Close\",\"enable\":true}";
-            nuiState.visible = false;
-            nuiState.mouse   = false;
+            NuiState.visible = false;
+            NuiState.mouse   = false;
             SendNuiMessage(jsonString);
         }
 
@@ -52,48 +48,51 @@ namespace Client
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
             if (type == 2)
             {
-                nuiState.visible = false;
-                nuiState.mouse = false;
+                NuiState.visible = false;
+                NuiState.mouse = false;
             }
             else
             {
-                nuiState.visible = true;
-                nuiState.mouse = true;
+                NuiState.visible = true;
+                NuiState.mouse = true;
             }
             SendNuiMessage(jsonString);
 
-            if(type == 2)
+            if(type == 1)
                 TriggerServerEvent("cs:engine:server:tracker:leave", "1");
+
+            if (type == 2)
+                TriggerServerEvent("cs:engine:server:tracker:leave:", "1");
         }
 
 
         public async void trackerOff()
         {
             string jsonString = "{\"type\":\"Off\",\"enable\":true}";
-            nuiState.visible = true;
-            nuiState.mouse   = true;
+            NuiState.visible = true;
+            NuiState.mouse   = true;
             SendNuiMessage(jsonString);
         }
 
         public async void trackerOk()
         {
             string jsonString = "{\"type\":\"On\",\"enable\":true}";
-            nuiState.visible = true;
-            nuiState.mouse   = true;
+            NuiState.visible = true;
+            NuiState.mouse   = true;
             SendNuiMessage(jsonString);
         }
 
-        public async void TrackerSetColor(IDictionary<string, object> json)
+        public async void trackerSetColor(IDictionary<string, object> json)
         {
             var math = Convert.ToInt32(json["x"]) + 1;
-            color = math.ToString();
+            Color = math.ToString();
         }
 
         public async void trackerJoin(IDictionary<string, object> json)
         {
             if (string.IsNullOrEmpty(json["channel"].ToString()))
             {
-                nuiNotify(config.msg_selfUserErrorFrequency, "");
+                nuiNotify(Config.msg_selfUserErrorFrequency, "");
                 trackerOff();
                 return;
             }
@@ -101,27 +100,27 @@ namespace Client
             if (string.IsNullOrEmpty(json["name"].ToString()))
             {
                 trackerOff();
-                nuiNotify(config.msg_selfUserNameFrequency, "");
+                nuiNotify(Config.msg_selfUserNameFrequency, "");
                 return;
             }
 
-            if (string.IsNullOrEmpty(color))
-                color = "1";
+            if (string.IsNullOrEmpty(Color))
+                Color = "1";
 
             TriggerServerEvent("cs:engine:server:tracker:on", json["channel"].ToString(), json["name"].ToString(),
-                               color);
+                               Color);
         }
 
         public async void trackerServerPing(string json, int pollingRate, int blipSprite)
         {
-            Dictionary<string, GpsNetworkClient> gps =
-                JsonConvert.DeserializeObject<Dictionary<string, GpsNetworkClient>>(json);
-            foreach (var v in gps)
+            Dictionary<string, TrackerJsonNetwork> trackerClients =
+                JsonConvert.DeserializeObject<Dictionary<string, TrackerJsonNetwork>>(json);
+            foreach (var v in trackerClients)
             {
-                if (v.Value.PedId != player.ServerId.ToString())
+                if (v.Value.PedId != Player.ServerId.ToString())
                 {
                     var blip = AddBlipForCoord(v.Value.PedCoordinats.X, v.Value.PedCoordinats.Y,
-                                               v.Value.PedCoordinats.Z);
+                                                  v.Value.PedCoordinats.Z);
                     SetBlipSprite(blip, blipSprite);
                     SetBlipColour(blip, Convert.ToInt32(v.Value.PedColor));
                     SetBlipScale(blip, 0.7f);
@@ -149,7 +148,7 @@ namespace Client
             RemoveBlip(ref blip);
         }
 
-        public class GpsNetworkClient
+        public class TrackerJsonNetwork
         {
             public string PedId;
             public string PedName;
@@ -160,7 +159,7 @@ namespace Client
 
         public async void nuiNotify(string[] msg, string replace = null)
         {
-            TriggerEvent(config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
+            TriggerEvent(Config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
         }
     }
 }

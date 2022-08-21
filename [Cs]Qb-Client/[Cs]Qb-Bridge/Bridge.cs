@@ -1,26 +1,24 @@
-﻿using System;
-using CitizenFX.Core;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Configuration;
+using CitizenFX.Core;
 
 namespace Client
 {
-    public class Bridge : BaseScript
+    public class Bridge 
     {
-        public SharedConfig configuration { get; set; }
-        public PlayerNoSql player { get; set; }
+        public SharedConfig Configuration { get; set; }
+        public PlayerData Player { get; set; }
 
-        public Bridge(SharedConfig _configuration)
+        public Bridge(SharedConfig configuration)
         {
-            configuration = _configuration;
-            PlayerNoSql _player = new PlayerNoSql();
-            player = _player;
-            //EventHandlers["C#:Engine:Client:Bridge:Data"] += new Action<string>(getDataFromServer);
+            Configuration = configuration;
+            PlayerData player = new PlayerData();
+            Player = player;
         }
 
-        public void getDataFromServer(string playerData)
+        public async void decodingData(string playerData)
         {
-            player = JsonConvert.DeserializeObject<PlayerNoSql>(playerData);
+            Player = JsonConvert.DeserializeObject<PlayerData>(playerData);
         }
     }
 }

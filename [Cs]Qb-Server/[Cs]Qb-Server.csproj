@@ -54,7 +54,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="[Cs]Qb-Bracelet\Bracelet.cs" />
+    <Compile Include="Properties\Bracelet.cs" />
     <Compile Include="[Cs]Qb-Bridge\Bridge.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="[Cs]Qb-FireShot\FireShot.cs" />
@@ -71,6 +71,8 @@
       <Name>[Cs]Qb-Conf</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="[Cs]Qb-Bracelet\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

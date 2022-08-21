@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using CitizenFX.Core;
-using CitizenFX.Core.Native;
-using static CitizenFX.Core.Native.API;
 using System.Drawing;
 
 namespace Configuration
@@ -106,7 +100,7 @@ namespace Configuration
         public List<string> jobs      { get; set; }
     }
 
-    public class GpsDic
+    public class TrackerDic
     {
         public string  PedLicence;
         public string  PedId;
@@ -130,7 +124,7 @@ namespace Configuration
         public Vector3 PedCoordinats;
     }
 
-    public class PlayerNoSql
+    public class PlayerData
     {
         public string name;
         public string id;

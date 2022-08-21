@@ -7,7 +7,6 @@ using Configuration;
 using Newtonsoft.Json;
 using static CitizenFX.Core.Native.API;
 using System.Linq;
-using System.Threading;
 
 namespace Client
 {
@@ -18,7 +17,7 @@ namespace Client
         private SharedConfig config         { get; set; }
         private int          chance         { get; set; }
         private List<Zone>   zoneList       { get; set; }
-        private  bool         canIcheckAgain { get; set; }
+        private  bool        canIcheckAgain { get; set; }
 
         public FireShot(SharedConfig _config)
         {
@@ -28,6 +27,7 @@ namespace Client
             random           = _random;
             config           = _config;
             canIcheckAgain   = true;
+
         }
 
         private async Task dexterPrescot(int buster)
@@ -38,8 +38,9 @@ namespace Client
 
         public async Task checkZone(int id)
         {
-            if (!canIcheckAgain)
-                return;
+
+           // if (!canIcheckAgain)
+                //return;
 
             canIcheckAgain = false;
             dexterPrescot(config.zoneWaitTime);
@@ -166,6 +167,7 @@ namespace Client
 
         public void fireShotServerResponse(int circleDuration,int circlesize, int x, int y, bool displayStreetName, string streetName )
         {
+           
             makeBlip(circleDuration, circlesize, x, y);
 
             if(displayStreetName)
@@ -181,7 +183,7 @@ namespace Client
             SetBlipScale(blip, (circlesize / 100));
             SetBlipColour(blip, config.zoneSpriteColor);
             SetBlipAsShortRange(blip, true);
-            await Delay(circleDuration);
+            await Delay(10000);
             RemoveBlip(ref blip);            
         }
 

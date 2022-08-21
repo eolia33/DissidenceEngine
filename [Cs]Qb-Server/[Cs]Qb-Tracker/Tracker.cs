@@ -12,76 +12,66 @@ namespace Server
 {
     public class Tracker : BaseScript
     {
-        public  int                             _serverId;
-        public  int                             _playerId;
-        private string                          licence;
-        private SharedConfig                    config;
-        public  bool                            awaiting      { get; set; }
-        private Dictionary<string, GpsDic>      gpsListing    { get; set; }
-        public  Dictionary<string, PlayerNoSql> playerNoSql   { get; set; }
-        private List<string>                    frequencyList { get; set; }
 
-        public Tracker(SharedConfig _config, BridgeQBCore bridge)
+        private string          Licence;
+        private SharedConfig    Config;
+        private Dictionary<string, TrackerDic>      TrackerClients    { get; set; }
+        public  Dictionary<string, PlayerData> PlayerData   { get; set; }
+        private List<string>                    FrequencyList { get; set; }
+
+        public Tracker(SharedConfig config, BridgeQbCore bridge)
         {
-            config      = _config;
-            playerNoSql = bridge.playerNoSql;
-            var _licence = "";
-            licence = _licence;
+            Config      = config;
+            PlayerData = bridge.PlayerData;
+            var licence = "";
+            Licence = licence;
+            var frequencyList  = new List<string>();
+            var trackerClients = new Dictionary<string, TrackerDic>();
 
-            var _frequencyList = new List<string>();
-            var _gpsListing    = new Dictionary<string, GpsDic>();
+            FrequencyList = frequencyList;
+            TrackerClients    = trackerClients;
 
-            frequencyList = _frequencyList;
-            gpsListing    = _gpsListing;
-
-            Task.Run(() => { gpsListeningClients(gpsListing, frequencyList); });
+            Task.Run(() => { trackerTask(TrackerClients, FrequencyList); });
         }
-
+        
         #region Connecting to Tracker
-
-        public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color,
-            int                                               notification)
+        public async void setNewGpsClient([FromSource] Player player, string frequency, string name, string color, int notification)
         {
             var id = player.Handle;
-            licence = player.Identifiers["license"];
-            var canAccess = true;
+            Licence = player.Identifiers["license"];
 
-            if (isRestricted(frequency, id, licence))
+            if (isRestricted(frequency, id, Licence))
             {
-                nuiNotify(id, config.msg_selfUserNameFrequencyRestricted, 1, "");
+                nuiNotify(id, Config.msg_selfUserNameFrequencyRestricted, 1, "");
                 Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:off:forced", 1);
                 return;
             }
 
-            if (!frequencyList.Contains(frequency))
-            {
-                frequencyList.Add(frequency);
-            }
+            if (!FrequencyList.Contains(frequency))
+                FrequencyList.Add(frequency);
             else
             {
-                var linq = gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedNotification == 1);
-                foreach (var result in linq)
-                    nuiNotify(result.Value.PedId, config.msg_otherUserJoinTracker, 1, "");
+                var linq = TrackerClients.Where(x => x.Value.PedFrequency == frequency && x.Value.PedNotification == 1);
+                foreach (var client in linq)
+                    nuiNotify(client.Value.PedId, Config.msg_otherUserJoinTracker, 1, "");
             }
 
-            nuiNotify(id, config.msg_selfUserJoinTracker, 1, frequency);
+            nuiNotify(id, Config.msg_selfUserJoinTracker, 1, frequency);
 
             Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:connected");
 
-            if (!gpsListing.ContainsKey(licence))
+            if (!TrackerClients.ContainsKey(Licence))
             {
-                gpsListing.Add(
-                    licence,
-                    dictionaryConstruct(licence, id, name, frequency, notification, GetEntityCoords(GetPlayerPed(id)),
+                TrackerClients.Add(
+                    Licence,
+                    dictionaryConstruct(Licence, id, name, frequency, notification, GetEntityCoords(GetPlayerPed(id)),
                                         color,   1,  0));
-                var r = gpsListing.Count().ToString();
+
             }
             else
-            {
-                dictionaryUpdate(licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color,
+                dictionaryUpdate(Licence, id, name, notification, frequency, GetEntityCoords(GetPlayerPed(id)), color,
                                  1);
-            }
-
+            
             await Task.FromResult(0);
         }
 
@@ -101,30 +91,30 @@ namespace Server
 
         private void userIsLeaving(string id, string licence, int reason)
         {
-            if (gpsListing.Any())
+            if (TrackerClients.Any())
             {
-                var linq = gpsListing.FirstOrDefault(x => x.Key.Contains(licence));
+                var linq = TrackerClients.FirstOrDefault(x => x.Key.Contains(licence));
 
                 if (linq.Value.PedLicence != null)
                 {
                     if (isItTheLastManStanding(linq.Value.PedFrequency, linq.Value.PedId))
-                        frequencyList.Remove(linq.Value.PedFrequency);
+                        FrequencyList.Remove(linq.Value.PedFrequency);
 
-                    gpsListing.Remove(linq.Value.PedLicence);
+                    TrackerClients.Remove(linq.Value.PedLicence);
 
-                    var linqb = gpsListing.Where(x => x.Value.PedFrequency    == linq.Value.PedFrequency &&
+                    var linqb = TrackerClients.Where(x => x.Value.PedFrequency    == linq.Value.PedFrequency &&
                                                       x.Value.PedNotification == 1);
 
                     switch (reason)
                     {
                         case 1:
-                            nuiNotify(id, config.msg_selfUserLeaveTracker, 1, "");
+                            nuiNotify(id, Config.msg_selfUserLeaveTracker, 1, "");
                             break;
                         case 2:
-                            nuiNotify(id, config.msg_selfUserLeaveTracker, 1, "");
+                            nuiNotify(id, Config.msg_selfUserLeaveTracker, 1, "");
                             break;
                         case 3:
-                            nuiNotify(id, config.msg_selfUserLeaveTrackerDuty, 1, "");
+                            nuiNotify(id, Config.msg_selfUserLeaveTrackerDuty, 1, "");
                             break;
                     }
 
@@ -132,17 +122,17 @@ namespace Server
                         switch (reason)
                         {
                             case 1:
-                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTracker, 1,
+                                nuiNotify(result.Value.PedId, Config.msg_otherUserLeaveTracker, 1,
                                           result.Value.PedName);
                                 break;
 
                             case 2:
-                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTrackerByForce, 1,
+                                nuiNotify(result.Value.PedId, Config.msg_otherUserLeaveTrackerByForce, 2,
                                           result.Value.PedName);
                                 break;
 
                             case 3:
-                                nuiNotify(result.Value.PedId, config.msg_otherUserLeaveTrackerByDuty, 1,
+                                nuiNotify(result.Value.PedId, Config.msg_otherUserLeaveTrackerByDuty, 1,
                                           result.Value.PedName);
                                 break;
                         }
@@ -152,15 +142,15 @@ namespace Server
 
         public void userColorChange([FromSource] Player player, string color)
         {
-            var linq    = gpsListing.FirstOrDefault(x => x.Value.PedLicence == player.Identifiers["license"]);
+            var linq    = TrackerClients.FirstOrDefault(x => x.Value.PedLicence == player.Identifiers["license"]);
             var colorOk = Convert.ToInt32(color) + 1;
-            gpsListing[linq.Key].PedColor = colorOk.ToString();
+            TrackerClients[linq.Key].PedColor = colorOk.ToString();
         }
 
 
         private bool isItTheLastManStanding(string frequency, string pedId)
         {
-            if (gpsListing.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId).Any())
+            if (TrackerClients.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId).Any())
                 return false;
 
             return true;
@@ -175,40 +165,39 @@ namespace Server
             if (status == "True")
                 return;
 
-            var linqNoSql = playerNoSql.FirstOrDefault(x => x.Key.Contains(licence));
+            var linqPlayerData = PlayerData.FirstOrDefault(x => x.Key.Contains(Licence));
 
-            if (linqNoSql.Key != null)
+            if (linqPlayerData.Key != null)
             {
-                linqNoSql.Value.jobOnDuty = status;
+                linqPlayerData.Value.jobOnDuty = status;
 
-                var tracker = gpsListing.FirstOrDefault(x => x.Key.Contains(licence));
+                var tracker = TrackerClients.FirstOrDefault(x => x.Key.Contains(Licence));
 
                 if (tracker.Key != null)
                 {
                     Debug.WriteLine("ceci est mon id" + id);
                     Players[Convert.ToInt32(id)].TriggerEvent("cs:engine:client:tracker:off:forced", 2);
-                    userIsLeaving(linqNoSql.Value.id, licence, 3);
+                    userIsLeaving(linqPlayerData.Value.id, Licence, 3);
                 }
             }
         }
 
         public bool isRestricted(string frequency, string id, string licence)
         {
-            var linqFrequency = config.restrictedFrequencies.Where(x => x.frequency == frequency);
+            var linqFrequency = Config.restrictedFrequencies.Where(x => x.frequency == frequency);
 
             if (linqFrequency.Any())
             {
-                var linqNoSql = playerNoSql.FirstOrDefault(x => x.Key.Contains(licence));
+                var linqPlayerData = PlayerData.FirstOrDefault(x => x.Key.Contains(licence));
 
-                foreach (var _frequency in linqFrequency)
-                    if (_frequency.frequency == frequency)
-                        foreach (var job in _frequency.jobs)
-                            if (job == linqNoSql.Value.jobName)
-                                if (linqNoSql.Value.jobOnDuty == "True")
+                foreach (var f in linqFrequency)
+                    if (f.frequency == frequency)
+                        foreach (var job in f.jobs)
+                            if (job == linqPlayerData.Value.jobName)
+                                if (linqPlayerData.Value.jobOnDuty == "True")
                                     return false;
                 return true;
             }
-
             return false;
         }
 
@@ -216,11 +205,11 @@ namespace Server
 
         #region Background Tracker Engine
 
-        private Task gpsListeningClients(Dictionary<string, GpsDic> gpsClient, List<string> frequencyList)
+        private Task trackerTask(Dictionary<string, TrackerDic> trackerClients, List<string> frequencyList)
         {
             while (true)
             {
-                foreach (var entry in gpsListing)
+                foreach (var entry in TrackerClients)
                 {
                     entry.Value.PedCoordinats = GetEntityCoords(GetPlayerPed(entry.Value.PedId));
                     entry.Value.PedDirection  = GetEntityHeading(GetPlayerPed(entry.Value.PedId));
@@ -228,34 +217,33 @@ namespace Server
 
                 foreach (var frequency in frequencyList)
                 {
-                    var linqC = gpsClient.Where(x => x.Value.PedFrequency == frequency).Count();
-
-                    if (linqC > 1)
+                    
+                    if (trackerClients.Where(x => x.Value.PedFrequency == frequency).Count() > 1)
                     {
-                        var linq = gpsClient.Where(x => x.Value.PedFrequency == frequency);
+                        var linq = trackerClients.Where(x => x.Value.PedFrequency == frequency);
 
-                        var gpsListingJson = new Dictionary<string, GpsNetworkClient>();
+                        var trackerJson = new Dictionary<string, TrackerDicNetwork>();
 
-                        foreach (var result in linq)
-                            gpsListingJson.Add(result.Value.PedId, new GpsNetworkClient
+                        foreach (var client in linq)
+                            trackerJson.Add(client.Value.PedId, new TrackerDicNetwork
                             {
-                                PedId         = result.Value.PedId,
-                                PedName       = result.Value.PedName,
-                                PedColor      = result.Value.PedColor,
-                                PedDirection  = result.Value.PedDirection,
-                                PedCoordinats = result.Value.PedCoordinats
+                                PedId         = client.Value.PedId,
+                                PedName       = client.Value.PedName,
+                                PedColor      = client.Value.PedColor,
+                                PedDirection  = client.Value.PedDirection,
+                                PedCoordinats = client.Value.PedCoordinats
                             });
 
-                        var jsonToPush = JsonConvert.SerializeObject(gpsListingJson);
+                        var jsonToPush = JsonConvert.SerializeObject(trackerJson);
 
-                        var linqJson = gpsClient.Where(x => x.Value.PedFrequency == frequency);
-                        foreach (var result in linqJson)
-                            Players[Convert.ToInt32(result.Value.PedId)].TriggerEvent("cs:engine:client:tracker:ping",
-                                jsonToPush, config.trackerServerPollingRate, config.trackerBlipSprite);
+                        var linqJson = trackerClients.Where(x => x.Value.PedFrequency == frequency);
+                        foreach (var client in linqJson)
+                            Players[Convert.ToInt32(client.Value.PedId)].TriggerEvent("cs:engine:client:tracker:ping",
+                                jsonToPush, Config.trackerServerPollingRate, Config.trackerBlipSprite);
                     }
                 }
 
-                Thread.Sleep(config.trackerServerPollingRate);
+                Thread.Sleep(Config.trackerServerPollingRate);
             }
         }
 
@@ -263,11 +251,10 @@ namespace Server
 
         #region Tracker Functions / Other
 
-        public GpsDic dictionaryConstruct(string licence, string id, string name, string frequency, int notification,
-            Vector3                              vector,
-            string                               color, int gpsType, float direction)
+        public TrackerDic dictionaryConstruct(string licence, string id, string name, string frequency, int notification, Vector3 vector,
+            string color, int gpsType, float direction)
         {
-            var newGpsClient = new GpsDic
+            var newTrackerClient = new TrackerDic
             {
                 PedLicence      = licence,
                 PedId           = id,
@@ -278,25 +265,23 @@ namespace Server
                 PedNotification = notification,
                 PedCoordinats   = vector
             };
-            return newGpsClient;
+            return newTrackerClient;
         }
 
         private void dictionaryUpdate(string licence, string id, string name, int notification, string frequency,
-            Vector3                          vector,
-            string                           color, int gpsType)
+            Vector3  vector, string color, int trackerType)
         {
-            var linq = gpsListing.FirstOrDefault(x => x.Value.PedLicence == licence);
-            gpsListing[linq.Key].PedId           = id;
-            gpsListing[linq.Key].PedName         = name;
-            gpsListing[linq.Key].PedFrequency    = frequency;
-            gpsListing[linq.Key].PedColor        = color;
-            gpsListing[linq.Key].PedDirection    = 0;
-            gpsListing[linq.Key].PedCoordinats   = vector;
-            gpsListing[linq.Key].PedNotification = notification;
+            var linq = TrackerClients.FirstOrDefault(x => x.Value.PedLicence == licence);
+            TrackerClients[linq.Key].PedId           = id;
+            TrackerClients[linq.Key].PedName         = name;
+            TrackerClients[linq.Key].PedFrequency    = frequency;
+            TrackerClients[linq.Key].PedColor        = color;
+            TrackerClients[linq.Key].PedDirection    = 0;
+            TrackerClients[linq.Key].PedCoordinats   = vector;
+            TrackerClients[linq.Key].PedNotification = notification;
         }
-
-
-        private class GpsNetworkClient
+        
+        private class TrackerDicNetwork
         {
             public string  PedId;
             public string  PedName;
@@ -314,11 +299,11 @@ namespace Server
             switch (type)
             {
                 case 1:
-                    Players[Convert.ToInt32(player)].TriggerEvent(config.notificationEngine, msg[0],
+                    Players[Convert.ToInt32(player)].TriggerEvent(Config.notificationEngine, msg[0],
                                                                   msg[1].Replace("{replace}", replace), msg[2], msg[3]);
                     break;
                 case 2:
-                    Players[Convert.ToInt32(player)].TriggerEvent(config.notificationEngine, msg[0],
+                    Players[Convert.ToInt32(player)].TriggerEvent(Config.notificationEngine, msg[0],
                                                                   msg[1].Replace("{replace}", replace), msg[2], msg[3]);
                     break;
             }
@@ -326,17 +311,17 @@ namespace Server
 
         public void userNotification([FromSource] Player player, int value)
         {
-            var linq = gpsListing.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
-            gpsListing[linq.Key].PedNotification = value;
+            var linq = TrackerClients.Where(x => x.Value.PedLicence == player.Identifiers["license"]).First();
+            TrackerClients[linq.Key].PedNotification = value;
 
             switch (value)
             {
                 case 0:
-                    nuiNotify(player.Handle, config.msg_selfTrackerNotificationOff, 1);
+                    nuiNotify(player.Handle, Config.msg_selfTrackerNotificationOff, 1);
                     break;
 
                 case 1:
-                    nuiNotify(player.Handle, config.msg_selfTrackerNotificationOn, 1);
+                    nuiNotify(player.Handle, Config.msg_selfTrackerNotificationOn, 1);
                     break;
             }
         }

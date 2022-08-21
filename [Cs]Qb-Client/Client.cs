@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using Configuration;
@@ -15,12 +14,10 @@ namespace Client
         public  int          LastLip     { get; set; }
         public  NuiState     NuiState     { get; set; }
         public  string       template     { get; set; }
-        public  Point[]      points       { get; set; }
-        public  bool         isDisplaying { get; set; }
-        public  bool         isMouse      { get; set; }
         public  Tracker      tracker      { get; set; }
         public  SharedConfig Config       { get; }
         public  FireShot     FireShot     { get; set; }
+        public  Bridge       Bridge       { get; set; }
 
 
         public Client()
@@ -35,6 +32,7 @@ namespace Client
             var lastBlip      = 0;
             LastLip           = lastBlip;
             FireShot          = fireShot;
+            Bridge            = bridge;
 
             EventHandlers["onClientResourceStart"]                    +=
                 new Action<string>(OnClientResourceStart);
@@ -54,6 +52,9 @@ namespace Client
             EventHandlers["cs:engine:client:tracker:off:forced"]      +=
                 new Action<int>(tracker.trackerLeave);
 
+            EventHandlers["cs:engine:client:playerdata:update"]       += 
+                new Action<string>(bridge.decodingData);
+
             RegisterNuiCallbackType("cs:engine:client:tracker:close");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) => { tracker.trackerClose(); });
@@ -70,7 +71,7 @@ namespace Client
             EventHandlers["__cfx_nui:cs:engine:client:tracker:color"] +=
                 new Action<IDictionary<string, object>, CallbackDelegate>((data, cb) =>
                 {
-                    tracker.TrackerSetColor(data);
+                    tracker.trackerSetColor(data);
                 });
 
             RegisterNuiCallbackType("cs:engine:client:tracker:coloronline");
@@ -98,19 +99,16 @@ namespace Client
         [Tick]
         private async Task OnTick()
         {
-            player = Game.Player;
-            SetNuiFocus(NuiState.visible, NuiState.mouse);
+           SetNuiFocus(NuiState.visible, NuiState.mouse);
 
             if (IsPedShooting(PlayerPedId()))
-                await FireShot.checkZone(PlayerPedId());
+                if(Bridge.Player.jobName != "police" && Bridge.Player.jobName != "sherif")
+                        await FireShot.checkZone(PlayerPedId());
+               else
+                    if(Bridge.Player.jobOnDuty != "True")
+                      await FireShot.checkZone(PlayerPedId());
+
         }
-
-
-        private void loadFromJsonTemplate(string response)
-        {
-            template = response;
-        }
-
         private void OnClientResourceStart(string resourceName)
         {
             player = Game.Player;
