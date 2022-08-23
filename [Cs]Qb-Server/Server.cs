@@ -15,9 +15,10 @@ namespace Server
             Config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
                                                                      "config.json"));
             var playerData = new BridgeQbCore(this);
-            var tracker    = new Tracker(Config, playerData);
+            var tracker = new Tracker(Config, playerData, this);
             var bracelet   = new Bracelet();
-            var fireShot   = new FireShot(playerData);
+            var fireShot   = new FireShot(playerData, this);
+            var cmd        = new Cmd(this, tracker, playerData, fireShot, Config);
 
             #region EventHandlers
 
@@ -35,23 +36,34 @@ namespace Server
 
             EventHandlers["C#:Engine:Server:Bracelet:PoliceNotification"] +=
                 new Action<string, string>(bracelet.getSecurityBraceletNotificationForPlolice);
+                EventHandlers["cs:engine:server:tracker:on"] +=
+               new Action<Player, string, string, string, int>(tracker.setNewGpsClient);
 
-            EventHandlers["cs:engine:server:tracker:on"] +=
-                new Action<Player, string, string, string, int>(tracker.setNewGpsClient);
-
-            EventHandlers["cs:engine:server:tracker:leave"] +=
+           EventHandlers["cs:engine:server:tracker:leave"] +=
                 new Action<Player,int>(tracker.userLeaving);
 
-            EventHandlers["cs:engine:server:tracker:color:change"] +=
+           EventHandlers["cs:engine:server:tracker:color:change"] +=
                 new Action<Player, string>(tracker.userColorChange);
 
             EventHandlers["cs:engine:server:tracker:notification"] +=
                 new Action<Player, int>(tracker.userNotification);
 
             EventHandlers["playerDropped"] +=
-                new Action<Player,string>(tracker.userLeavingDrop);
+              new Action<Player,string>(tracker.userLeavingDrop);
             
             #endregion
         }
+        
+        public void C(string msg)
+        {
+            Debug.WriteLine("\x1b[36m" + msg);
+        }
+
+        public string buildKey(string license, string id)
+        {
+            return license + id;
+        }
+        
+        
     }
 }

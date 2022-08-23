@@ -113,8 +113,10 @@ namespace Client
 
         public async void trackerServerPing(string json, int pollingRate, int blipSprite)
         {
-            Dictionary<string, TrackerJsonNetwork> trackerClients =
+   Dictionary<string, TrackerJsonNetwork> trackerClients =
                 JsonConvert.DeserializeObject<Dictionary<string, TrackerJsonNetwork>>(json);
+   
+   Debug.WriteLine(json);
             foreach (var v in trackerClients)
             {
                 if (v.Value.PedId != Player.ServerId.ToString())
@@ -122,26 +124,17 @@ namespace Client
                     var blip = AddBlipForCoord(v.Value.PedCoordinats.X, v.Value.PedCoordinats.Y,
                                                   v.Value.PedCoordinats.Z);
                     SetBlipSprite(blip, blipSprite);
+                    SetBlipDisplay(blip,3);
                     SetBlipColour(blip, Convert.ToInt32(v.Value.PedColor));
-                    SetBlipScale(blip, 0.7f);
+                    SetBlipScale(blip, 0.9f);
                     SetBlipRotation(blip, Ceil(v.Value.PedDirection));
-                    SetBlipAsShortRange(blip, true);
-                    BeginTextCommandSetBlipName("STRING");
-                    AddTextComponentString("." + v.Value.PedName);
-                    EndTextCommandSetBlipName(blip); 
+                    SetBlipHiddenOnLegend(blip, true);
+                    //SetBlipAsShortRange(blip, true);
                     removeBlip(blip, pollingRate);
 
                 }
             }
         }
-
-        public async void MakeBlip(Vector3 location)
-        {
-            var blip = AddBlipForCoord(location[0], location[1], location[2]);
-            SetBlipSprite(blip, 1);
-            SetBlipColour(blip, 3);
-        }
-
         private async Task removeBlip(int blip, int time)
         {
             await Delay(time);
@@ -161,5 +154,6 @@ namespace Client
         {
             TriggerEvent(Config.notificationEngine, msg[0], msg[1], msg[2], msg[3]);
         }
+        
     }
 }

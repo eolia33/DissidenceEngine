@@ -51,6 +51,14 @@ namespace Configuration
         public Zone[] Zone { get; set; }
     }
 
+    public partial class TrackerMemory
+    {
+        public string Username     { get; set; }
+        public string Frequency    { get; set; }
+        public bool   Notification { get; set; }
+        public string Color        { get; set; } 
+        public string TrackerType  { get; set; }
+    }
     public partial class Zone
     {
         public string       Name              { get; set; }
@@ -126,24 +134,25 @@ namespace Configuration
 
     public class PlayerData
     {
-        public string name;
-        public string id;
-        public string gangName;
-        public string gangIsboss;
-        public string gangLabel;
-        public string citizenid;
-        public string phone;
-        public string cid;
-        public string firstname;
-        public string lastname;
-        public string gender;
-        public string jobOnDuty;
-        public string jobName;
-        public string jobGrade;
-        public string license;
-        public string gangGrade;
-        public string birthdate;
-        public string account;
+        public string              name;
+        public string              id;
+        public string              gangName;
+        public string              gangIsboss;
+        public string              gangLabel;
+        public string              citizenid;
+        public string              phone;
+        public string              cid;
+        public string              firstname;
+        public string              lastname;
+        public string              gender;
+        public string              jobOnDuty;
+        public string              jobName;
+        public string              jobGrade;
+        public string              license;
+        public string              gangGrade;
+        public string              birthdate;
+        public string              account;
+        public List<TrackerMemory> trackerMemories;
     }
 
     public class NuiState

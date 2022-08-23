@@ -40,7 +40,7 @@ namespace Client
         {
 
            // if (!canIcheckAgain)
-                //return;
+              //  return;
 
             canIcheckAgain = false;
             dexterPrescot(config.zoneWaitTime);
@@ -56,7 +56,8 @@ namespace Client
 
             var linq = jsonContent.ShootingZone.Zone.Where(x => x.Y == filter);
             foreach (var item in linq)
-            {
+            {            
+                
                 var zonePoints = item.ZonePoints;
 
                 if (isInZone(zonePoints, playerPoint))
@@ -67,6 +68,7 @@ namespace Client
                 }
             }
 
+            Debug.WriteLine("hello3");
             if (!inLoop)
             {
                 var zoneToSwitch  = config.zoneDefaultJobToSwtichSouth;
@@ -151,14 +153,14 @@ namespace Client
             return 0;
         }
 
-        private static bool isInZone(Point[] poly, Point pnt)
+        private static bool isInZone(Point[] poly, Point point)
         {
             int i, j;
             var nvert = poly.Length;
             var c = false;
             for (i = 0, j = nvert - 1; i < nvert; j = i++)
-                if (poly[i].Y > pnt.Y != poly[j].Y > pnt.Y &&
-                    pnt.X < (poly[j].X - poly[i].X) * (pnt.Y - poly[i].Y) / (poly[j].Y - poly[i].Y) + poly[i].X)
+                if (poly[i].Y > point.Y != poly[j].Y > point.Y &&
+                    point.X < (poly[j].X - poly[i].X) * (point.Y - poly[i].Y) / (poly[j].Y - poly[i].Y) + poly[i].X)
                     c = !c;
 
             return c;
@@ -178,9 +180,8 @@ namespace Client
 
         private async Task makeBlip(int circleDuration, int circlesize, int x, int y)
         {
-            var blip = AddBlipForCoord(x, y, 0);
+            var blip = AddBlipForRadius(x, y, 0, (circlesize));
             SetBlipSprite(blip, config.zoneSprite);
-            SetBlipScale(blip, (circlesize / 100));
             SetBlipColour(blip, config.zoneSpriteColor);
             SetBlipAsShortRange(blip, true);
             await Delay(10000);

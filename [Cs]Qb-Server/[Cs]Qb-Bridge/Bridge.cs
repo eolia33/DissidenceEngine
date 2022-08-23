@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using CitizenFX.Core;
 using Configuration;
@@ -17,26 +18,35 @@ namespace Server
             var playerData = new Dictionary<string, PlayerData>();
             PlayerData = playerData;
             Server      = server;
+            
+            Server.C("(bridge) Initialisation");
         }
-
-        public void x(string msg)
-        {
-            Debug.WriteLine("\x1b[36m" + msg);
-        }
+        
 
         public async void getDataFromQbCore(string id, string json)
-        {
+        {            
+            Server.C("(bridge) : getDataFromQbCore :: start");
+            
             var playerData = JsonConvert.DeserializeObject<dynamic>(json);
+            if (!PlayerData.ContainsKey(Server.buildKey(playerData["license"].ToString(), id)))
+            {
+                PlayerData.Add(Server.buildKey(playerData["license"].ToString(),id), globalSql(playerData, id, 1)); 
+            }
 
-            if (!PlayerData.ContainsKey(playerData["license"].ToString()))
-                PlayerData.Add(playerData["license"].ToString(), globalSql(playerData, id, 1));
+
 
             else
+            {
                 globalSql(playerData, id, 2);
+
+            }
+
+            Server.C("(bridge) : getDataFromQbCore :: end");
         }
 
         public PlayerData globalSql(dynamic playerData, string id, int action)
         {
+            Server.C("(bridge) : globalSql :: start");
             var data = new PlayerData
             {
                 name       = playerData["name"].ToString(),
@@ -59,19 +69,21 @@ namespace Server
                 jobGrade   = playerData["job"]["grade"]["name"].ToString()
             };
 
+            Server.C("(bridge) : globalSql :: #1");
             switch (action)
             {
                 case 1:
+                    Server.C("(bridge) : globalSql :: case #1");
                     Players[Convert.ToInt32(id)]
                         .TriggerEvent("cs:engine:client:playerdata:update", JsonConvert.SerializeObject(data));
                     break;
 
-                case 2:
+                case 2: 
+                    Server.C("(bridge) : globalSql :: case #2");
                     Players[Convert.ToInt32(id)]
                         .TriggerEvent("cs:engine:client:playerdata:update", JsonConvert.SerializeObject(data));
-
-                    var linq = PlayerData.First(x => x.Value.license == playerData["license"].ToString());
-
+                    
+                    var linq = PlayerData.First(x => x.Key == Server.buildKey(playerData["license"].ToString(),id));
                     PlayerData[linq.Key].name       = data.name;
                     PlayerData[linq.Key].id         = id;
                     PlayerData[linq.Key].license    = data.license;
@@ -81,7 +93,7 @@ namespace Server
                     PlayerData[linq.Key].gangGrade  = data.gangGrade;
                     PlayerData[linq.Key].citizenid  = data.citizenid;
                     PlayerData[linq.Key].birthdate  = data.birthdate;
-                    PlayerData[linq.Key].phone      = data.phone;
+                    PlayerData[linq.Key].phone      = data.phone;                                                       
                     PlayerData[linq.Key].cid        = id;
                     PlayerData[linq.Key].lastname   = data.lastname;
                     PlayerData[linq.Key].gender     = data.gender;
@@ -89,10 +101,10 @@ namespace Server
                     PlayerData[linq.Key].jobOnDuty  = data.jobOnDuty;
                     PlayerData[linq.Key].jobName    = data.jobName;
                     break;
-            }
-
-            ;
+            }           
+            Server.C("(bridge) : globalSql :: end");
             return data;
-        }
+        }   
+
     }
 }

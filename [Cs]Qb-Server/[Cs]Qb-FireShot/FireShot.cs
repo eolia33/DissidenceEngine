@@ -9,19 +9,25 @@ namespace Server
     public class FireShot : BaseScript
     {
         public BridgeQbCore Bridge { get; }
+        public Server       Server { get; }
 
-        public FireShot(BridgeQbCore bridge)
+        public FireShot(BridgeQbCore bridge, Server server)
         {
             Bridge = bridge;
+            Server = server;
+            
+            Server.C("Fireshot :: Initialisation de l'objet FireShot");
         }
 
         public void getActiveCops(string json)
         {
+            Server.C("getActiveCops :: starting");
             var alert = JsonConvert.DeserializeObject<Policealert>(json);
             var isAny = false;
 
             foreach (var item in alert.jobtotriger)
             {
+                Server.C("Fireshot :: getActiveCops :: Foreach #1");
                 var test = Bridge.PlayerData.First();
                 var linq = Bridge.PlayerData.Where(x => x.Value.jobName == item && x.Value.jobOnDuty == "True");
 
@@ -41,7 +47,8 @@ namespace Server
 
             if (!isAny && alert.defaultSwitchJob)
                 foreach (var item in alert.jobToSwitch)
-                {
+                { 
+                    Server.C("Fireshot :: getActiveCops :: Foreach #2");
                     var linq = Bridge.PlayerData.Where(x => x.Value.jobName == item && x.Value.jobOnDuty == "True");
 
                     if (linq.Any())
@@ -54,6 +61,9 @@ namespace Server
                                 Convert.ToBoolean(alert.displayStreetName),
                                 Convert.ToString(alert.streetName));
                 }
+            
+            Server.C("Fireshot :: getActiveCops :: Ending");
         }
+
     }
 }

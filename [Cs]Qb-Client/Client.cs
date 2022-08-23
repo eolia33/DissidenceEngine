@@ -52,8 +52,8 @@ namespace Client
             EventHandlers["cs:engine:client:tracker:off:forced"]      +=
                 new Action<int>(tracker.trackerLeave);
 
-            EventHandlers["cs:engine:client:playerdata:update"]       += 
-                new Action<string>(bridge.decodingData);
+           EventHandlers["cs:engine:client:playerdata:update"]       += 
+              new Action<string>(bridge.decodingData);
 
             RegisterNuiCallbackType("cs:engine:client:tracker:close");
             EventHandlers["__cfx_nui:cs:engine:client:tracker:close"] +=
@@ -100,14 +100,22 @@ namespace Client
         private async Task OnTick()
         {
            SetNuiFocus(NuiState.visible, NuiState.mouse);
-
-            if (IsPedShooting(PlayerPedId()))
-                if(Bridge.Player.jobName != "police" && Bridge.Player.jobName != "sherif")
-                        await FireShot.checkZone(PlayerPedId());
+           
+           if (IsPedShooting(PlayerPedId()))
+           {
+               if (Bridge.Player.jobName == "police")
+               {
+                   if (Bridge.Player.jobOnDuty != "True")
+                   {
+                       await FireShot.checkZone(PlayerPedId());
+                   }
+               }
                else
-                    if(Bridge.Player.jobOnDuty != "True")
-                      await FireShot.checkZone(PlayerPedId());
-
+               {
+                   await FireShot.checkZone(PlayerPedId());
+               }
+           }
+ 
         }
         private void OnClientResourceStart(string resourceName)
         {
@@ -117,17 +125,27 @@ namespace Client
             RegisterCommand("securityBracelet", new Action<int, List<object>, string>((source, args, raw) =>
             {
                 var targetId = string.Join(" ", args.ToArray());
-                TriggerServerEvent("C#:Engine:Server:Bracelet:CheckPosition" + template, player.ServerId, targetId);
+                TriggerServerEvent("cs:engine:server:cmd:cdv" + template, player.ServerId, targetId);
             }), false);
 
-            RegisterCommand("dataupdate", new Action<int, List<object>, string>((source, args, raw) =>
+            RegisterCommand("cUpdate", new Action<int, List<object>, string>((source, args, raw) =>
             {
-                TriggerServerEvent("cs:engine:client:qbcore:getdata", GetPlayerServerId(player.Handle));
+                TriggerServerEvent("cs:engine:server:cmd:cdv", GetPlayerServerId(player.Handle));
             }), false);
 
             RegisterCommand("duty", new Action<string>((source) =>
             {
                 TriggerServerEvent("QBCore:ToggleDuty", GetPlayerServerId(player.Handle));
+            }), false);
+            
+            RegisterCommand("cDv", new Action<int, List<object>, string>((source, args, raw) =>
+            {
+                TriggerServerEvent("cs:engine:server:cmd:cdv", GetPlayerServerId(player.Handle));
+            }), false);
+
+            RegisterCommand("cTrackerTImer", new Action<string>((source) =>
+            {
+                TriggerServerEvent("cs:engine:server:cmd:ctracker:timer", GetPlayerServerId(player.Handle));
             }), false);
 
         }
@@ -135,8 +153,7 @@ namespace Client
         private void securityBraceletRespFromServ(string copsId, string args, Vector3 vector)
         {
             TriggerServerEvent("C#:Engine:Server:Bracelet:PoliceNotification" + template, copsId,
-                               "[Security Corporation] -  Localisation : " + World.GetStreetName(vector));
-            tracker.MakeBlip(vector);
+                               "[Security Corporation] -  Localisation : " + World.GetStreetName(vector)); 
         }
     }
 }

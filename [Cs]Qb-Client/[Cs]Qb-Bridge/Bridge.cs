@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Configuration;
-using CitizenFX.Core;
 
 namespace Client
 {
@@ -16,7 +15,9 @@ namespace Client
             Player = player;
         }
 
+#pragma warning disable CS1998
         public async void decodingData(string playerData)
+#pragma warning restore CS1998
         {
             Player = JsonConvert.DeserializeObject<PlayerData>(playerData);
         }

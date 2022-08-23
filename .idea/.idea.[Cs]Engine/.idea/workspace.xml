@@ -8,17 +8,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ade33172-a4c1-49e0-bdff-0470b952a16c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Cmd/cmd.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Thread.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.[Cs]Engine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/[Cs]Engine.sln" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Engine.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Bridge/Bridge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Bridge/Bridge.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Client.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-FireShot/FiresShot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-FireShot/FiresShot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-FireShot/Json.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-FireShot/Json.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Tracker/Tracker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Client/[Cs]Qb-Tracker/Tracker.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/Configuration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Conf/[Cs]Qb-Conf.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/Server.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bracelet/Bracelet.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Bridge/Bridge.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-FireShot/FireShot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-FireShot/FireShot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Server.csproj" afterDir="false" />
@@ -31,7 +30,17 @@
   </component>
   <component name="Git.Settings">
     <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fd63beb5b0094912a3ae15796284ccb310c00/31/719b1063/BaseScript.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/[Cs]Qb-Server/[Cs]Qb-Tracker/Thread.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -54,7 +63,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -87,7 +96,18 @@
       <workItem from="1661002539310" duration="3984000" />
       <workItem from="1661042431062" duration="120000" />
       <workItem from="1661043769778" duration="371000" />
-      <workItem from="1661044165777" duration="1881000" />
+      <workItem from="1661044165777" duration="6596000" />
+      <workItem from="1661053645862" duration="43000" />
+      <workItem from="1661086908191" duration="2879000" />
+      <workItem from="1661127999190" duration="1266000" />
+      <workItem from="1661163221358" duration="4121000" />
+      <workItem from="1661203613690" duration="4800000" />
+      <workItem from="1661208723945" duration="2225000" />
+      <workItem from="1661212166976" duration="13000" />
+      <workItem from="1661212605173" duration="2914000" />
+      <workItem from="1661243793120" duration="6061000" />
+      <workItem from="1661253366085" duration="13971000" />
+      <workItem from="1661277931709" duration="91000" />
     </task>
     <task id="LOCAL-00001" summary="Fonctionnel !">
       <created>1660946412384</created>
@@ -96,7 +116,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660946412384</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Cleaning, working">
+      <created>1661046091420</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1661046091420</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -116,6 +143,11 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Fonctionnel !" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fonctionnel !" />
+    <MESSAGE value="Cleaning, working" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning, working" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
