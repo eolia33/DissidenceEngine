@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using CitizenFX.Core;
 using Configuration;
 using Newtonsoft.Json;
@@ -16,6 +14,7 @@ namespace Server
     {
 
         private string          Licence;
+
         private SharedConfig    Config;
         private Dictionary<string, TrackerDic>      TrackerClients    { get; set; }
         public  Dictionary<string, PlayerData> PlayerData   { get; set; }
@@ -23,7 +22,7 @@ namespace Server
         
         private Server Server { get; set; }
         
-        readonly CancellationTokenSource Cts = new CancellationTokenSource();  
+        readonly CancellationTokenSource Cts = new CancellationTokenSource();   
 
         public Tracker(SharedConfig config, BridgeQbCore bridge, Server server)
         {
@@ -38,8 +37,7 @@ namespace Server
             FrequencyList  = frequencyList;
             TrackerClients = trackerClients;
             Server         = server;
-
-            //_ = Task.Run(() => { trackerTask(TrackerClients, FrequencyList); });
+            _              = Task.Run(async () => await trackerTask(TrackerClients, FrequencyList));
             Server.C("Tracker :: Objet initialisé");
         }
         
@@ -159,11 +157,9 @@ namespace Server
 
         private bool isItTheLastManStanding(string frequency, string pedId)
         {
-            Server.C("Tracker : isTheLastManStanding :: start");
-            if (TrackerClients.Where(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId).Any())
-                return false;
+            Server.C("Tracker : isTheLastManStanding :: start");   
 
-            return true;
+            return TrackerClients.Any(x => x.Value.PedFrequency == frequency && x.Value.PedId != pedId) ?  false : true;
         }
 
         #endregion
@@ -177,8 +173,8 @@ namespace Server
             if (status == "True")
                 return;
 
-            var linqPlayerData = PlayerData.FirstOrDefault(x => x.Key.Contains(Server.buildKey(Licence,id)));
 
+            var linqPlayerData = PlayerData.FirstOrDefault(x => x.Key.Contains(Server.buildKey(Licence,id)));
             if (linqPlayerData.Key != null)
             {
                 linqPlayerData.Value.jobOnDuty = status;

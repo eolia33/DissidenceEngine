@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using Configuration;
@@ -36,11 +37,31 @@ namespace Client
             canIcheckAgain = true;
         }
 
+        public bool parking(int id)
+        {
+            var playerCoords = GetEntityCoords(id, false);
+            var playerPoint  = new Point(Convert.ToInt32(playerCoords.X), Convert.ToInt32(playerCoords.Y));
+
+            if (playerCoords.Z < 3)
+            {
+                var linq = jsonContent.ShootingZone.Zone.Where(x => x.Name == "Parking");
+                foreach (var item in linq)
+                {
+                    var zonePoints = item.ZonePoints;
+                    if (isInZone(zonePoints, playerPoint))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
         public async Task checkZone(int id)
         {
 
-           // if (!canIcheckAgain)
-              //  return;
+            if (!canIcheckAgain)
+               return;
 
             canIcheckAgain = false;
             dexterPrescot(config.zoneWaitTime);
@@ -67,8 +88,7 @@ namespace Client
                     break;
                 }
             }
-
-            Debug.WriteLine("hello3");
+            
             if (!inLoop)
             {
                 var zoneToSwitch  = config.zoneDefaultJobToSwtichSouth;
@@ -176,6 +196,8 @@ namespace Client
                 nui(config.msg_zoneNotification, "Au niveau de : " + streetName);
             else 
                 nui(config.msg_zoneNotification, "");
+
+            
         }  
 
         private async Task makeBlip(int circleDuration, int circlesize, int x, int y)

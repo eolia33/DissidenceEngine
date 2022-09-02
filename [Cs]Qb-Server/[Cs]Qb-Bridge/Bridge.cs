@@ -26,15 +26,13 @@ namespace Server
         public async void getDataFromQbCore(string id, string json)
         {            
             Server.C("(bridge) : getDataFromQbCore :: start");
-            
+
             var playerData = JsonConvert.DeserializeObject<dynamic>(json);
+
             if (!PlayerData.ContainsKey(Server.buildKey(playerData["license"].ToString(), id)))
             {
                 PlayerData.Add(Server.buildKey(playerData["license"].ToString(),id), globalSql(playerData, id, 1)); 
             }
-
-
-
             else
             {
                 globalSql(playerData, id, 2);
@@ -59,7 +57,7 @@ namespace Server
                 citizenid  = playerData["citizenid"].ToString(),
                 birthdate  = playerData["charinfo"]["birthdate"].ToString(),
                 phone      = playerData["charinfo"]["phone"].ToString(),
-                cid        = id,
+                cid        = playerData["cid"].ToString(),
                 firstname  = playerData["charinfo"]["firstname"].ToString(),
                 lastname   = playerData["charinfo"]["lastname"].ToString(),
                 gender     = playerData["charinfo"]["gender"].ToString(),
@@ -94,7 +92,7 @@ namespace Server
                     PlayerData[linq.Key].citizenid  = data.citizenid;
                     PlayerData[linq.Key].birthdate  = data.birthdate;
                     PlayerData[linq.Key].phone      = data.phone;                                                       
-                    PlayerData[linq.Key].cid        = id;
+                    PlayerData[linq.Key].cid        = data.cid;
                     PlayerData[linq.Key].lastname   = data.lastname;
                     PlayerData[linq.Key].gender     = data.gender;
                     PlayerData[linq.Key].account    = data.account;

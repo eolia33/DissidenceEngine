@@ -24,7 +24,7 @@ namespace Server
             Server.C("getActiveCops :: starting");
             var alert = JsonConvert.DeserializeObject<Policealert>(json);
             var isAny = false;
-
+            
             foreach (var item in alert.jobtotriger)
             {
                 Server.C("Fireshot :: getActiveCops :: Foreach #1");

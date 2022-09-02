@@ -1,6 +1,8 @@
 ﻿using System;
 using CitizenFX.Core;
 using Configuration;
+using CsCoreServer.Scaffold;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CitizenFX.Core.Native.API;
 
@@ -9,16 +11,18 @@ namespace Server
 {
     public class Server : BaseScript
     {
-        public SharedConfig Config { get; }
+        public SharedConfig  Config { get; }
         public Server()
         {
             Config = JsonConvert.DeserializeObject<SharedConfig>(LoadResourceFile(GetCurrentResourceName(),
                                                                      "config.json"));
             var playerData = new BridgeQbCore(this);
-            var tracker = new Tracker(Config, playerData, this);
+            var tracker    = new Tracker(Config, playerData, this);
             var bracelet   = new Bracelet();
             var fireShot   = new FireShot(playerData, this);
             var cmd        = new Cmd(this, tracker, playerData, fireShot, Config);
+            var sql        = new serverContext();
+           // var billing    = new Billing(sql);
 
             #region EventHandlers
 
@@ -56,7 +60,10 @@ namespace Server
         
         public void C(string msg)
         {
+
+            if (Config.debug)
             Debug.WriteLine("\x1b[36m" + msg);
+            
         }
 
         public string buildKey(string license, string id)

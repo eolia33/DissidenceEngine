@@ -9,7 +9,10 @@ namespace Configuration
         public int                         zoneWaitTime                        { get; set; }
         public string                      zoneDefaultName                     { get; set; }
         
-        
+        public bool debug { get; set; }
+
+        public bool IsPoweredOnStartup { get; set; }
+        public string DisplayRadioKeybind { get; set; }
         public bool         zoneDefaultDisPlayStreetName { get; set; }
         public List<string> zoneDefaultJobToTriggerNorth { get; set; }
         public List<string> zoneDefaultJobToTriggerSouth { get; set; }
